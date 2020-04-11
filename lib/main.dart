@@ -1,7 +1,12 @@
-import 'package:desktop_game_helper/settings.dart';
+import 'dart:async';
+
+import 'package:desktop_game_helper/repository/settings_repository.dart';
 import 'package:desktop_game_helper/value_keeper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+
+import 'model/settings.dart';
+import 'model/value_keeper_config.dart';
 
 void main() {
   runApp(MyApp());
@@ -40,33 +45,62 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final settings = Settings([
-    ValueKeeperConfig(ValueKeeperStyle.LARGE),
-    ValueKeeperConfig(ValueKeeperStyle.SMALL),
-    ValueKeeperConfig(ValueKeeperStyle.LARGE,
-        displayInterval: true,
-        interval: 100,
-        name: 'counter 3 counter 3 counter 3 counter 3 counter 3 counter 3'),
-    ValueKeeperConfig(ValueKeeperStyle.SMALL,
-        displayInterval: true, interval: 100, name: 'counter 4'),
-  ]);
+  final default_settings = Settings.build(
+    0,
+    [
+      ValueKeeperConfig(ValueKeeperStyle.LARGE),
+      ValueKeeperConfig(ValueKeeperStyle.SMALL),
+      ValueKeeperConfig(ValueKeeperStyle.LARGE,
+          displayInterval: true,
+          interval: 100,
+          name: 'counter 3 counter 3 counter 3 counter 3 counter 3 counter 3'),
+      ValueKeeperConfig(ValueKeeperStyle.SMALL,
+          displayInterval: true, interval: 100, name: 'counter 4'),
+    ],
+    'default',
+    true,
+  );
 
-  final slidableController = SlidableController();
+  final _settingsRepository = SettingsRepository();
 
-  void removeItemAt(int index) {
-    setState(() => settings.configs.removeAt(index));
+  final _streamController = StreamController<Settings>.broadcast();
+
+  final _slidableController = SlidableController();
+
+  void _removeItemAt(int index) async {
+    final current = await _settingsRepository.getCurrent();
+    final edited = current.removeConfigItemAt(index);
+    await _settingsRepository.update(edited);
+    _update();
+  }
+
+  void _update() {
+    _settingsRepository.getCurrent().then((value) {
+      if (value == null) {
+        _settingsRepository.add(default_settings);
+        _settingsRepository.select(default_settings.id);
+        _streamController.add(default_settings);
+      } else {
+        _streamController.add(value);
+      }
+    });
   }
 
   @override
-  Widget build(BuildContext context) {
-    final listView = ListView.separated(
+  void initState() {
+    _update();
+    super.initState();
+  }
+
+  Widget _buildList(Settings settings) {
+    return ListView.separated(
       itemBuilder: (context, index) {
         if (settings.configs.length <= index) {
           return null;
         }
         return Slidable(
           key: Key(index.toString()),
-          controller: slidableController,
+          controller: _slidableController,
           actionPane: SlidableDrawerActionPane(),
           child: settings.configs[index].build(),
           actions: <Widget>[
@@ -87,7 +121,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     FlatButton(
                       child: Text('Remove'),
                       onPressed: () {
-                        removeItemAt(index);
+                        _removeItemAt(index);
                         Navigator.pop(context);
                       },
                     ),
@@ -109,12 +143,29 @@ class _MyHomePageState extends State<MyHomePage> {
         color: Color.alphaBlend(Colors.white70, Colors.grey),
       ),
     );
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text(widget.title),
-        ),
-        backgroundColor: Color.alphaBlend(Colors.black12, Colors.white),
-        body: listView);
+      appBar: AppBar(
+        title: Text(widget.title),
+      ),
+      backgroundColor: Color.alphaBlend(Colors.black12, Colors.white),
+      body: StreamBuilder(
+          stream: _streamController.stream,
+          builder: (context, snapshot) {
+            if (snapshot.data == null) {
+              return Container(
+                color: Colors.white,
+                child: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              );
+            } else {
+              return _buildList(snapshot.data);
+            }
+          }),
+    );
   }
 }

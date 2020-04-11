@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'config.dart';
+import 'model/value_keeper_config.dart';
 
 class ValueKeeper extends StatefulWidget {
   ValueKeeper(this.config, {Key key}) : super(key: key);
@@ -56,9 +56,9 @@ class _ValueKeeperState extends State<ValueKeeper> {
 
   @override
   void initState() {
-    super.initState();
     _textEditingController = TextEditingController(text: _counter.toString());
     _focus.addListener(_onFocusChange);
+    super.initState();
   }
 
   @override
@@ -223,24 +223,5 @@ extension ValueKeeperStyleExtension on ValueKeeperStyle {
       default:
         return null;
     }
-  }
-}
-
-class ValueKeeperConfig extends Config {
-  ValueKeeperStyle style;
-  int interval;
-  bool displayInterval;
-  String name;
-
-  ValueKeeperConfig(
-    this.style, {
-    this.interval = 1,
-    this.displayInterval = false,
-    this.name = '',
-  }) : super('ValueKeeper');
-
-  @override
-  Widget build() {
-    return ValueKeeper(this);
   }
 }
