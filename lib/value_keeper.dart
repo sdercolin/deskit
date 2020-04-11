@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'config.dart';
+
 class ValueKeeper extends StatefulWidget {
   ValueKeeper(this.config, {Key key}) : super(key: key);
 
@@ -224,12 +226,21 @@ extension ValueKeeperStyleExtension on ValueKeeperStyle {
   }
 }
 
-class ValueKeeperConfig {
+class ValueKeeperConfig extends Config {
   ValueKeeperStyle style;
   int interval;
   bool displayInterval;
   String name;
 
-  ValueKeeperConfig(this.style,
-      {this.interval = 1, this.displayInterval = false, this.name = ''});
+  ValueKeeperConfig(
+    this.style, {
+    this.interval = 1,
+    this.displayInterval = false,
+    this.name = '',
+  }) : super('ValueKeeper');
+
+  @override
+  Widget build() {
+    return ValueKeeper(this);
+  }
 }

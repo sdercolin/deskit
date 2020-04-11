@@ -1,3 +1,4 @@
+import 'package:desktop_game_helper/settings.dart';
 import 'package:desktop_game_helper/value_keeper.dart';
 import 'package:flutter/material.dart';
 
@@ -40,29 +41,31 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
+    final settings = Settings([
+      ValueKeeperConfig(ValueKeeperStyle.LARGE),
+      ValueKeeperConfig(ValueKeeperStyle.SMALL),
+      ValueKeeperConfig(ValueKeeperStyle.LARGE,
+          displayInterval: true,
+          interval: 100,
+          name: 'counter 3 counter 3 counter 3 counter 3 counter 3 counter 3'),
+      ValueKeeperConfig(ValueKeeperStyle.SMALL,
+          displayInterval: true, interval: 100, name: 'counter 4'),
+    ]);
+
+    final listView = ListView.builder(itemBuilder: (context, index) {
+      if (settings.configs.length <= index) {
+        return null;
+      }
+      return ListTile(
+        title: settings.configs[index].build(),
+      );
+    });
+
     return Scaffold(
         appBar: AppBar(
           title: Text(widget.title),
         ),
-        backgroundColor: Color.alphaBlend(Colors.white60, Colors.black),
-        body: SingleChildScrollView(
-          child: Container(
-            color: Color.alphaBlend(Colors.white70, Colors.grey),
-            child: Wrap(
-              runSpacing: 0.3,
-              children: <Widget>[
-                ValueKeeper(ValueKeeperConfig(ValueKeeperStyle.LARGE)),
-                ValueKeeper(ValueKeeperConfig(ValueKeeperStyle.SMALL)),
-                ValueKeeper(ValueKeeperConfig(ValueKeeperStyle.LARGE,
-                    displayInterval: true,
-                    interval: 100,
-                    name:
-                        'counter 3 counter 3 counter 3 counter 3 counter 3 counter 3')),
-                ValueKeeper(ValueKeeperConfig(ValueKeeperStyle.SMALL,
-                    displayInterval: true, interval: 100, name: 'counter 4')),
-              ],
-            ),
-          ),
-        ));
+        backgroundColor: Color.alphaBlend(Colors.black12, Colors.white),
+        body: listView);
   }
 }
