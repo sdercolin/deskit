@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: title,
         theme: ThemeData(
-          primarySwatch: Colors.pink,
+          primarySwatch: Colors.amber,
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
         home: MyHomePage(title: title),
@@ -44,6 +44,25 @@ class _MyHomePageState extends State<MyHomePage> {
         appBar: AppBar(
           title: Text(widget.title),
         ),
-        body: ValueKeeper());
+        backgroundColor: Color.alphaBlend(Colors.white60, Colors.black),
+        body: SingleChildScrollView(
+          child: Container(
+            color: Color.alphaBlend(Colors.white70, Colors.grey),
+            child: Wrap(
+              runSpacing: 0.3,
+              children: <Widget>[
+                ValueKeeper(ValueKeeperConfig(ValueKeeperStyle.LARGE)),
+                ValueKeeper(ValueKeeperConfig(ValueKeeperStyle.SMALL)),
+                ValueKeeper(ValueKeeperConfig(ValueKeeperStyle.LARGE,
+                    displayInterval: true,
+                    interval: 100,
+                    name:
+                        'counter 3 counter 3 counter 3 counter 3 counter 3 counter 3')),
+                ValueKeeper(ValueKeeperConfig(ValueKeeperStyle.SMALL,
+                    displayInterval: true, interval: 100, name: 'counter 4')),
+              ],
+            ),
+          ),
+        ));
   }
 }
