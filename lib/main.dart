@@ -1,6 +1,7 @@
 import 'package:desktop_game_helper/settings.dart';
 import 'package:desktop_game_helper/value_keeper.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 void main() {
   runApp(MyApp());
@@ -52,14 +53,36 @@ class _MyHomePageState extends State<MyHomePage> {
           displayInterval: true, interval: 100, name: 'counter 4'),
     ]);
 
-    final listView = ListView.builder(itemBuilder: (context, index) {
-      if (settings.configs.length <= index) {
-        return null;
-      }
-      return ListTile(
-        title: settings.configs[index].build(),
-      );
-    });
+    final listView = ListView.separated(
+      itemBuilder: (context, index) {
+        if (settings.configs.length <= index) {
+          return null;
+        }
+        return Slidable(
+          actionPane: SlidableDrawerActionPane(),
+          child: settings.configs[index].build(),
+          actions: <Widget>[
+            IconSlideAction(
+              caption: 'Remove',
+              color: Colors.red,
+              icon: Icons.delete,
+            ),
+            IconSlideAction(
+              caption: 'Edit',
+              color: Colors.amber,
+              icon: Icons.settings,
+            ),
+          ],
+        );
+      },
+      itemCount: settings.configs.length,
+      separatorBuilder: (context, index) {
+        return Divider(
+          height: 0.3,
+          color: Color.alphaBlend(Colors.white70, Colors.grey),
+        );
+      },
+    );
 
     return Scaffold(
         appBar: AppBar(
