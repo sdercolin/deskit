@@ -40,25 +40,33 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  final settings = Settings([
+    ValueKeeperConfig(ValueKeeperStyle.LARGE),
+    ValueKeeperConfig(ValueKeeperStyle.SMALL),
+    ValueKeeperConfig(ValueKeeperStyle.LARGE,
+        displayInterval: true,
+        interval: 100,
+        name: 'counter 3 counter 3 counter 3 counter 3 counter 3 counter 3'),
+    ValueKeeperConfig(ValueKeeperStyle.SMALL,
+        displayInterval: true, interval: 100, name: 'counter 4'),
+  ]);
+
+  final slidableController = SlidableController();
+
+  void removeItemAt(int index) {
+    setState(() => settings.configs.removeAt(index));
+  }
+
   @override
   Widget build(BuildContext context) {
-    final settings = Settings([
-      ValueKeeperConfig(ValueKeeperStyle.LARGE),
-      ValueKeeperConfig(ValueKeeperStyle.SMALL),
-      ValueKeeperConfig(ValueKeeperStyle.LARGE,
-          displayInterval: true,
-          interval: 100,
-          name: 'counter 3 counter 3 counter 3 counter 3 counter 3 counter 3'),
-      ValueKeeperConfig(ValueKeeperStyle.SMALL,
-          displayInterval: true, interval: 100, name: 'counter 4'),
-    ]);
-
     final listView = ListView.separated(
       itemBuilder: (context, index) {
         if (settings.configs.length <= index) {
           return null;
         }
         return Slidable(
+          key: Key(index.toString()),
+          controller: slidableController,
           actionPane: SlidableDrawerActionPane(),
           child: settings.configs[index].build(),
           actions: <Widget>[
@@ -66,6 +74,26 @@ class _MyHomePageState extends State<MyHomePage> {
               caption: 'Remove',
               color: Colors.red,
               icon: Icons.delete,
+              onTap: () => showDialog(
+                context: context,
+                builder: (_) => AlertDialog(
+                  title: Text('Remove widget'),
+                  content: Text('Are you sure to remove this widget?'),
+                  actions: <Widget>[
+                    FlatButton(
+                      child: Text('Cancel'),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                    FlatButton(
+                      child: Text('Remove'),
+                      onPressed: () {
+                        removeItemAt(index);
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ],
+                ),
+              ),
             ),
             IconSlideAction(
               caption: 'Edit',
@@ -76,12 +104,10 @@ class _MyHomePageState extends State<MyHomePage> {
         );
       },
       itemCount: settings.configs.length,
-      separatorBuilder: (context, index) {
-        return Divider(
-          height: 0.3,
-          color: Color.alphaBlend(Colors.white70, Colors.grey),
-        );
-      },
+      separatorBuilder: (_, __) => Divider(
+        height: 0.3,
+        color: Color.alphaBlend(Colors.white70, Colors.grey),
+      ),
     );
 
     return Scaffold(
