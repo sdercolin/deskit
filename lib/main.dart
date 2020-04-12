@@ -108,6 +108,7 @@ class _MyHomePageState extends State<MyHomePage> {
               final current = await _settingsRepository.getCurrent();
               final edited = current.removeConfigItemAt(index);
               await _settingsRepository.update(edited);
+              await _widgetDataRepository.removeAt(index);
               Navigator.pop(context);
               _updateAsync();
             },
