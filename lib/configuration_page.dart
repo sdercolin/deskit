@@ -15,6 +15,7 @@ class ConfigurationPage extends StatefulWidget {
 
 class ConfigurationPageState extends State<ConfigurationPage> {
   Config currentConfig;
+  String title;
 
   void update(Function() updateFunction) {
     setState(() {
@@ -31,9 +32,10 @@ class ConfigurationPageState extends State<ConfigurationPage> {
 
     final preview = currentConfig.build();
     final list = currentConfig.buildEditList(this);
+    title ??= list.title;
     return Scaffold(
       appBar: AppBar(
-        title: Text(list.title),
+        title: Text(title),
       ),
       backgroundColor: Colors.white,
       resizeToAvoidBottomInset: false,
