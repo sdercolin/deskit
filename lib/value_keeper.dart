@@ -1,3 +1,4 @@
+import 'package:desktop_game_helper/common/text_edit_alert_dialog.dart';
 import 'package:desktop_game_helper/repository/widget_data_repository.dart';
 import 'package:flutter/material.dart';
 
@@ -18,8 +19,8 @@ class ValueKeeper extends StatefulWidget {
 }
 
 class _ValueKeeperState extends State<ValueKeeper> {
-  static final _defaultValue = ValueKeeperData.defaultValue;
-  var _value = _defaultValue;
+  var _defaultValue;
+  var _value;
   final _focus = FocusNode();
   var _isFocus = false;
 
@@ -30,24 +31,65 @@ class _ValueKeeperState extends State<ValueKeeper> {
     widget.repository?.updateAt(ValueKeeperData(newValue), widget.id);
   }
 
-  void _incrementCounter() {
+  void _increment(BuildContext context) async {
+    int interval;
+    if (widget.config.requestIntervalEveryTime) {
+      interval = await _requestInterval(context, true);
+    } else {
+      interval = widget.config.interval;
+    }
+    if (interval == null) {
+      return;
+    }
+    var newValue = _value + interval;
+    newValue = ValueKeeperConfig.validateValue(newValue);
     setState(() {
-      var newValue = _value + widget.config.interval;
-      newValue = ValueKeeperConfig.validateValue(newValue);
       _setValue(newValue);
       _refresh();
       _focus.unfocus();
     });
   }
 
-  void _decrementCounter() {
+  void _decrement(BuildContext context) async {
+    int interval;
+    if (widget.config.requestIntervalEveryTime) {
+      interval = await _requestInterval(context, false);
+    } else {
+      interval = widget.config.interval;
+    }
+    if (interval == null) {
+      return;
+    }
+    var newValue = _value - interval;
+    newValue = ValueKeeperConfig.validateValue(newValue);
     setState(() {
-      var newValue = _value - widget.config.interval;
-      newValue = ValueKeeperConfig.validateValue(newValue);
       _setValue(newValue);
       _refresh();
       _focus.unfocus();
     });
+  }
+
+  Future<int> _requestInterval(BuildContext context, bool incremental) async {
+    final title = incremental ? 'Increment by' : 'Decrement by';
+    final inputText = await TextFieldAlertDialog.show(
+      context,
+      title,
+      '',
+      inputType: TextInputType.number,
+    );
+    int input;
+    if (inputText != null) {
+      input = int.tryParse(inputText);
+    }
+    if (input != null && input > 0) {
+      return input;
+    } else {
+      Scaffold.of(context)
+        ..removeCurrentSnackBar()
+        ..showSnackBar(
+            SnackBar(content: Text('You should input a positive integer.')));
+      return null;
+    }
   }
 
   void _refresh() {
@@ -73,6 +115,8 @@ class _ValueKeeperState extends State<ValueKeeper> {
 
   @override
   void initState() {
+    _defaultValue = widget.config.initialValue;
+    _value = _defaultValue;
     _textEditingController = TextEditingController(text: _value.toString());
     _focus.addListener(_onFocusChange);
     final data = widget.repository?.get(widget.id);
@@ -92,29 +136,41 @@ class _ValueKeeperState extends State<ValueKeeper> {
   @override
   Widget build(BuildContext context) {
     final config = widget.config;
+    _defaultValue = config.initialValue;
 
     Widget plusButton;
     Widget minusButton;
-    if (config.displayInterval) {
+    if (config.requestIntervalEveryTime) {
+      plusButton = IconButton(
+        icon: Icon(Icons.add_circle_outline),
+        onPressed: () => _increment(context),
+        iconSize: config.style.roundButtonSize,
+      );
+      minusButton = IconButton(
+        icon: Icon(Icons.remove_circle_outline),
+        onPressed: () => _decrement(context),
+        iconSize: config.style.roundButtonSize,
+      );
+    } else if (config.displayInterval) {
       plusButton = FlatButton.icon(
         icon: Icon(Icons.add_circle_outline),
-        onPressed: _incrementCounter,
+        onPressed: () => _increment(context),
         label: Text(config.interval.toString()),
       );
       minusButton = FlatButton.icon(
         icon: Icon(Icons.remove_circle_outline),
-        onPressed: _decrementCounter,
+        onPressed: () => _decrement(context),
         label: Text(config.interval.toString()),
       );
     } else {
       plusButton = IconButton(
         icon: Icon(config.style.arrowButtonIconPlus),
-        onPressed: _incrementCounter,
+        onPressed: () => _increment(context),
         iconSize: config.style.arrowButtonSize,
       );
       minusButton = IconButton(
         icon: Icon(config.style.arrowButtonIconMinus),
-        onPressed: _decrementCounter,
+        onPressed: () => _decrement(context),
         iconSize: config.style.arrowButtonSize,
       );
     }
@@ -177,7 +233,7 @@ class _ValueKeeperState extends State<ValueKeeper> {
         break;
     }
 
-    if (config.name?.isNotEmpty == true) {
+    if (config.name.isNotEmpty) {
       return Container(
         color: Colors.white,
         child: Stack(
@@ -245,9 +301,20 @@ extension ValueKeeperStyleExtension on ValueKeeperStyle {
   double get arrowButtonSize {
     switch (this) {
       case ValueKeeperStyle.SMALL:
-        return 30;
+        return 40;
       case ValueKeeperStyle.LARGE:
         return 50;
+      default:
+        return null;
+    }
+  }
+
+  double get roundButtonSize {
+    switch (this) {
+      case ValueKeeperStyle.SMALL:
+        return 25;
+      case ValueKeeperStyle.LARGE:
+        return 30;
       default:
         return null;
     }

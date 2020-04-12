@@ -19,18 +19,22 @@ class ValueKeeperConfig extends Config {
   final typeInfo = WidgetTypeInfo.VALUE_KEEPER;
 
   static const maxInterval = 10000;
-  static const _maxAbsoluteValue = 99999999;
+  static const maxAbsoluteValue = 99999999;
 
   ValueKeeperStyle style;
   int interval;
   bool displayInterval;
   String name;
+  bool requestIntervalEveryTime;
+  int initialValue;
 
   ValueKeeperConfig({
     this.style = ValueKeeperStyle.LARGE,
     this.interval = 1,
     this.displayInterval = false,
     this.name = '',
+    this.requestIntervalEveryTime = false,
+    this.initialValue = 0,
   }) : super(TYPE);
 
   @override
@@ -42,17 +46,25 @@ class ValueKeeperConfig extends Config {
   ConfigEditList buildEditList(EditWidgetPageState parentState) =>
       ValueKeeperConfigEditList(this, parentState);
 
-  factory ValueKeeperConfig.fromJson(String json) =>
-      _$ValueKeeperConfigFromJson(jsonDecode(json));
+  factory ValueKeeperConfig.fromJson(String json) {
+    final item = _$ValueKeeperConfigFromJson(jsonDecode(json));
+    item.style ??= ValueKeeperStyle.LARGE;
+    item.interval ??= 1;
+    item.displayInterval ??= false;
+    item.name ??= '';
+    item.requestIntervalEveryTime ??= false;
+    item.initialValue ??= 0;
+    return item;
+  }
 
   @override
   String toJson() => jsonEncode(_$ValueKeeperConfigToJson(this));
 
   static int validateValue(int value) {
-    if (value > _maxAbsoluteValue) {
-      return _maxAbsoluteValue;
-    } else if (value < -_maxAbsoluteValue) {
-      return -_maxAbsoluteValue;
+    if (value > maxAbsoluteValue) {
+      return maxAbsoluteValue;
+    } else if (value < -maxAbsoluteValue) {
+      return -maxAbsoluteValue;
     } else {
       return value;
     }

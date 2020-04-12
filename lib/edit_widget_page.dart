@@ -165,14 +165,14 @@ class ValueKeeperConfigEditList extends ConfigEditList<ValueKeeperConfig> {
             children: <Widget>[
               Container(
                 child: Text(
-                  'Edit display name',
+                  'Display name',
                   textAlign: TextAlign.left,
                   style: Style.PreferenceTitle,
                 ),
               ),
               Container(
                 constraints: BoxConstraints(maxWidth: 200),
-                child: config.name?.isNotEmpty == true
+                child: config.name.isNotEmpty
                     ? Text(
                         config.name,
                         overflow: TextOverflow.ellipsis,
@@ -188,7 +188,7 @@ class ValueKeeperConfigEditList extends ConfigEditList<ValueKeeperConfig> {
         ),
         onTap: () async {
           final result = await TextFieldAlertDialog.show(
-              context, 'Edit display name', config.name ?? '');
+              context, 'Edit display name', config.name);
           if (result != null) {
             parentState.update(() {
               config.name = result;
@@ -205,38 +205,110 @@ class ValueKeeperConfigEditList extends ConfigEditList<ValueKeeperConfig> {
             children: <Widget>[
               Container(
                 child: Text(
-                  'Interval',
+                  'Initial value',
                   textAlign: TextAlign.left,
                   style: Style.PreferenceTitle,
                 ),
               ),
               Container(
-                child: Text(config.interval.toString()),
+                child: Text(config.initialValue.toString()),
               ),
             ],
           ),
         ),
         onTap: () async {
           final result = await TextFieldAlertDialog.show(
-              context, 'Edit interval', config.interval.toString() ?? '',
+              context, 'Edit initial value', config.initialValue.toString() ?? '',
               inputType: TextInputType.number);
           if (result != null) {
             final intResult = int.tryParse(result);
-            final max = ValueKeeperConfig.maxInterval;
-            if (intResult != null && intResult > 0 && intResult <= max) {
+            final min = -ValueKeeperConfig.maxAbsoluteValue;
+            final max = ValueKeeperConfig.maxAbsoluteValue;
+            if (intResult != null && intResult >= min && intResult <= max) {
               parentState.update(() {
-                config.interval = intResult;
+                config.initialValue = intResult;
               });
             } else {
               Scaffold.of(context)
                 ..removeCurrentSnackBar()
                 ..showSnackBar(SnackBar(
                     content: Text(
-                        'Interval should be an integer between 1 and $max.')));
+                        'Initial value should be an integer between $min and $max.')));
             }
           }
         },
       ),
+      config.requestIntervalEveryTime
+          ? null
+          : InkWell(
+              child: Container(
+                constraints: itemConstraints,
+                padding: itemPadding,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Container(
+                      child: Text(
+                        'Interval',
+                        textAlign: TextAlign.left,
+                        style: Style.PreferenceTitle,
+                      ),
+                    ),
+                    Container(
+                      child: Text(config.interval.toString()),
+                    ),
+                  ],
+                ),
+              ),
+              onTap: () async {
+                final result = await TextFieldAlertDialog.show(
+                    context, 'Edit interval', config.interval.toString() ?? '',
+                    inputType: TextInputType.number);
+                if (result != null) {
+                  final intResult = int.tryParse(result);
+                  final max = ValueKeeperConfig.maxInterval;
+                  if (intResult != null && intResult > 0 && intResult <= max) {
+                    parentState.update(() {
+                      config.interval = intResult;
+                    });
+                  } else {
+                    Scaffold.of(context)
+                      ..removeCurrentSnackBar()
+                      ..showSnackBar(SnackBar(
+                          content: Text(
+                              'Interval should be an integer between 1 and $max.')));
+                  }
+                }
+              },
+            ),
+      config.requestIntervalEveryTime
+          ? null
+          : Container(
+              constraints: itemConstraints,
+              padding: itemPadding,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Container(
+                    child: Text(
+                      'Display interval',
+                      textAlign: TextAlign.left,
+                      style: Style.PreferenceTitle,
+                    ),
+                  ),
+                  Container(
+                    child: Switch(
+                      value: config.displayInterval,
+                      onChanged: (value) {
+                        parentState.update(() {
+                          config.displayInterval = value;
+                        });
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
       Container(
         constraints: itemConstraints,
         padding: itemPadding,
@@ -245,17 +317,20 @@ class ValueKeeperConfigEditList extends ConfigEditList<ValueKeeperConfig> {
           children: <Widget>[
             Container(
               child: Text(
-                'Display interval',
+                'Request interval every time',
                 textAlign: TextAlign.left,
                 style: Style.PreferenceTitle,
               ),
             ),
             Container(
-              child: Checkbox(
-                value: config.displayInterval,
+              child: Switch(
+                value: config.requestIntervalEveryTime,
                 onChanged: (value) {
                   parentState.update(() {
-                    config.displayInterval = value;
+                    config.requestIntervalEveryTime = value;
+                    if (value) {
+                      config.displayInterval = false;
+                    }
                   });
                 },
               ),
@@ -264,6 +339,6 @@ class ValueKeeperConfigEditList extends ConfigEditList<ValueKeeperConfig> {
         ),
       ),
       SizedBox(height: 10),
-    ];
+    ].where((element) => element != null).toList();
   }
 }
