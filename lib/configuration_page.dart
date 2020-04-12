@@ -45,10 +45,10 @@ class ConfigurationPageState extends State<ConfigurationPage> {
             padding: EdgeInsets.symmetric(vertical: 5),
             child: Divider(
               height: 0.3,
-              color: Colors.grey,
+              color: Color.alphaBlend(Colors.white70, Colors.grey),
             ),
           ),
-          list,
+          list
         ],
       ),
     );
@@ -73,10 +73,39 @@ abstract class ConfigEditList<T extends Config> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final contents = buildList(parentState.currentConfig);
     return SingleChildScrollView(
-      padding: EdgeInsets.symmetric(horizontal: 20),
       child: Column(
-        children: buildList(parentState.currentConfig),
+        children: [
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              children: contents,
+            ),
+          ),
+          SizedBox(height: 15),
+          ButtonBar(
+            buttonPadding: EdgeInsets.all(15),
+            children: <Widget>[
+              RaisedButton(
+                padding: EdgeInsets.symmetric(horizontal: 30),
+                child: Text('Cancel'),
+                onPressed: () {
+                  Navigator.pop(context, null);
+                },
+              ),
+              RaisedButton(
+                color: Colors.amber,
+                textColor: Colors.black,
+                padding: EdgeInsets.symmetric(horizontal: 30),
+                child: Text('Save'),
+                onPressed: () {
+                  Navigator.pop(context, parentState.currentConfig);
+                },
+              ),
+            ],
+          )
+        ],
       ),
     );
   }

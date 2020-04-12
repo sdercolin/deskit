@@ -71,28 +71,20 @@ class _MyHomePageState extends State<MyHomePage> {
 
   final _slidableController = SlidableController();
 
-  void _removeItemAt(int index) async {
-    final current = await _settingsRepository.getCurrent();
-    final edited = current.removeConfigItemAt(index);
-    await _settingsRepository.update(edited);
-    _update();
-  }
-
-  void _update() {
-    _settingsRepository.getCurrent().then((value) {
-      if (value == null) {
-        _settingsRepository.add(default_settings);
-        _settingsRepository.select(default_settings.id);
-        _streamController.add(default_settings);
-      } else {
-        _streamController.add(value);
-      }
-    });
+  void _updateAsync() async {
+    final value = await _settingsRepository.getCurrent();
+    if (value == null) {
+      _settingsRepository.add(default_settings);
+      _settingsRepository.select(default_settings.id);
+      _streamController.add(default_settings);
+    } else {
+      _streamController.add(value);
+    }
   }
 
   @override
   void initState() {
-    _update();
+    _updateAsync();
     super.initState();
   }
 
@@ -124,9 +116,12 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                     FlatButton(
                       child: Text('Remove'),
-                      onPressed: () {
-                        _removeItemAt(index);
+                      onPressed: () async {
+                        final current = await _settingsRepository.getCurrent();
+                        final edited = current.removeConfigItemAt(index);
+                        await _settingsRepository.update(edited);
                         Navigator.pop(context);
+                        _updateAsync();
                       },
                     ),
                   ],
@@ -137,11 +132,28 @@ class _MyHomePageState extends State<MyHomePage> {
               caption: 'Edit',
               color: Colors.amber,
               icon: Icons.settings,
-              onTap: () => Navigator.pushNamed(
-                context,
-                ConfigurationPage.routeName,
-                arguments: ConfigurationPageArguments(settings.configs[index]),
-              ),
+              onTap: () async {
+                final result = await Navigator.pushNamed(
+                  context,
+                  ConfigurationPage.routeName,
+                  arguments:
+                      ConfigurationPageArguments(settings.configs[index]),
+                );
+
+                if (result != null) {
+                  final current = await _settingsRepository.getCurrent();
+                  final configs = current.configs.toList();
+                  configs[index] = result;
+                  final edited = current.copy(configs: configs);
+                  await _settingsRepository.update(edited);
+                  await _updateAsync();
+
+                  Scaffold.of(context)
+                    ..removeCurrentSnackBar()
+                    ..showSnackBar(
+                        SnackBar(content: Text('Configuration edited.')));
+                }
+              },
             ),
           ],
         );
