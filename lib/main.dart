@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:desktop_game_helper/configuration_page.dart';
 import 'package:desktop_game_helper/repository/settings_repository.dart';
 import 'package:desktop_game_helper/value_keeper.dart';
 import 'package:flutter/material.dart';
@@ -30,6 +31,9 @@ class MyApp extends StatelessWidget {
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
         home: MyHomePage(title: title),
+        routes: {
+          ConfigurationPage.routeName: (context) => ConfigurationPage(),
+        },
       ),
     );
   }
@@ -133,6 +137,11 @@ class _MyHomePageState extends State<MyHomePage> {
               caption: 'Edit',
               color: Colors.amber,
               icon: Icons.settings,
+              onTap: () => Navigator.pushNamed(
+                context,
+                ConfigurationPage.routeName,
+                arguments: ConfigurationPageArguments(settings.configs[index]),
+              ),
             ),
           ],
         );

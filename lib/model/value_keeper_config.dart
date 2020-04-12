@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:json_annotation/json_annotation.dart';
 
+import '../configuration_page.dart';
 import '../value_keeper.dart';
 import 'config.dart';
 
@@ -24,16 +25,19 @@ class ValueKeeperConfig extends Config {
   }) : super(TYPE);
 
   @override
-  Widget build() {
-    return ValueKeeper(this);
-  }
-
-  factory ValueKeeperConfig.fromJson(String json) {
-    return _$ValueKeeperConfigFromJson(jsonDecode(json));
-  }
+  Widget build() => ValueKeeper(this);
 
   @override
-  String toJson() {
-    return jsonEncode(_$ValueKeeperConfigToJson(this));
-  }
+  String getEditPageTitle() =>
+      'Configure value keeper' + (name?.isNotEmpty == true ? ': $name' : '');
+
+  @override
+  ConfigEditList buildEditList(ConfigurationPageState parentState) =>
+      ValueKeeperConfigEditList(this, parentState);
+
+  factory ValueKeeperConfig.fromJson(String json) =>
+      _$ValueKeeperConfigFromJson(jsonDecode(json));
+
+  @override
+  String toJson() => jsonEncode(_$ValueKeeperConfigToJson(this));
 }

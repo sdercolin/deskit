@@ -224,4 +224,15 @@ extension ValueKeeperStyleExtension on ValueKeeperStyle {
         return null;
     }
   }
+
+  String get displayName {
+    switch (this) {
+      case ValueKeeperStyle.SMALL:
+        return 'Small';
+      case ValueKeeperStyle.LARGE:
+        return 'Large';
+      default:
+        return null;
+    }
+  }
 }
