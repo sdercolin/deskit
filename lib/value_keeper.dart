@@ -163,7 +163,7 @@ class _ValueKeeperState extends State<ValueKeeper> {
                   constraints: BoxConstraints(maxWidth: 100),
                   child: Text(
                     config.name,
-                    overflow: TextOverflow.ellipsis,
+                    overflow: TextOverflow.fade,
                     softWrap: false,
                     style: TextStyle(fontSize: 10),
                   ),

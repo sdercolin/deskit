@@ -3,6 +3,7 @@ import 'package:desktop_game_helper/model/value_keeper_config.dart';
 import 'package:desktop_game_helper/value_keeper.dart';
 import 'package:flutter/material.dart';
 
+import 'common/text_edit_alert_dialog.dart';
 import 'consts/style.dart';
 
 class ConfigurationPage extends StatefulWidget {
@@ -35,6 +36,7 @@ class ConfigurationPageState extends State<ConfigurationPage> {
         title: Text(list.title),
       ),
       backgroundColor: Colors.white,
+      resizeToAvoidBottomInset: false,
       body: Column(
         children: <Widget>[
           Padding(
@@ -69,21 +71,17 @@ abstract class ConfigEditList<T extends Config> extends StatelessWidget {
   ConfigEditList(this.originalConfig, this.parentState)
       : title = originalConfig.getEditPageTitle();
 
-  List<Widget> buildList(T config);
+  List<Widget> buildList(BuildContext context, T config);
 
   @override
   Widget build(BuildContext context) {
-    final contents = buildList(parentState.currentConfig);
+    final contents = buildList(context, parentState.currentConfig);
     return SingleChildScrollView(
       child: Column(
         children: [
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            child: Column(
-              children: contents,
-            ),
+          Column(
+            children: contents,
           ),
-          SizedBox(height: 15),
           ButtonBar(
             buttonPadding: EdgeInsets.all(15),
             children: <Widget>[
@@ -117,37 +115,81 @@ class ValueKeeperConfigEditList extends ConfigEditList<ValueKeeperConfig> {
       : super(originalConfig, parentState);
 
   @override
-  List<Widget> buildList(ValueKeeperConfig config) {
+  List<Widget> buildList(BuildContext context, ValueKeeperConfig config) {
+    final itemPadding = EdgeInsets.symmetric(horizontal: 20, vertical: 13);
+
     return [
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: <Widget>[
-          Container(
-            child: Text(
-              'Style',
-              textAlign: TextAlign.left,
-              style: Style.PreferenceTitle,
+      Padding(
+        padding: itemPadding,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Container(
+              child: Text(
+                'Style',
+                textAlign: TextAlign.left,
+                style: Style.PreferenceTitle,
+              ),
             ),
-          ),
-          DropdownButton<ValueKeeperStyle>(
-            value: config.style,
-            elevation: 16,
-            underline: Container(height: 2),
-            items: ValueKeeperStyle.values
-                .map((ValueKeeperStyle value) =>
-                    DropdownMenuItem<ValueKeeperStyle>(
-                      value: value,
-                      child: Text(value.displayName),
-                    ))
-                .toList(),
-            onChanged: (ValueKeeperStyle value) {
-              parentState.update(() {
-                config.style = value;
-              });
-            },
-          ),
-        ],
+            DropdownButton<ValueKeeperStyle>(
+              value: config.style,
+              elevation: 16,
+              items: ValueKeeperStyle.values
+                  .map((ValueKeeperStyle value) =>
+                      DropdownMenuItem<ValueKeeperStyle>(
+                        value: value,
+                        child: Text(value.displayName),
+                      ))
+                  .toList(),
+              onChanged: (ValueKeeperStyle value) {
+                parentState.update(() {
+                  config.style = value;
+                });
+              },
+            ),
+          ],
+        ),
       ),
+      InkWell(
+        child: Padding(
+          padding: itemPadding,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Container(
+                child: Text(
+                  'Edit display name',
+                  textAlign: TextAlign.left,
+                  style: Style.PreferenceTitle,
+                ),
+              ),
+              Container(
+                constraints: BoxConstraints(maxWidth: 200),
+                child: config.name?.isNotEmpty == true
+                    ? Text(
+                        config.name,
+                        overflow: TextOverflow.ellipsis,
+                        softWrap: false,
+                      )
+                    : Text(
+                        'Undefined',
+                        style: TextStyle(fontStyle: FontStyle.italic),
+                      ),
+              ),
+            ],
+          ),
+        ),
+        onTap: () async {
+          final result = await TextFieldAlertDialog.show(
+              context, 'Edit display name', config.name ?? '');
+          if (result != null) {
+            parentState.update(() {
+              config.name = result;
+            });
+          }
+        },
+      ),
+      SizedBox(height: 10),
     ];
   }
 }
