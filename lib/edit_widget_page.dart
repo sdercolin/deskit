@@ -80,13 +80,12 @@ abstract class ConfigEditList<T extends Config> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final contents = buildList(context, parentState.currentConfig);
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          Column(
-            children: contents,
-          ),
-          ButtonBar(
+    return Flexible(
+      child: ListView.builder(itemBuilder: (context, index) {
+        if (index < contents.length) {
+          return contents[index];
+        } else if (index == contents.length) {
+          return ButtonBar(
             buttonPadding: EdgeInsets.all(15),
             children: <Widget>[
               RaisedButton(
@@ -106,9 +105,11 @@ abstract class ConfigEditList<T extends Config> extends StatelessWidget {
                 },
               ),
             ],
-          )
-        ],
-      ),
+          );
+        } else {
+          return null;
+        }
+      }),
     );
   }
 }
@@ -217,8 +218,8 @@ class ValueKeeperConfigEditList extends ConfigEditList<ValueKeeperConfig> {
           ),
         ),
         onTap: () async {
-          final result = await TextFieldAlertDialog.show(
-              context, 'Edit initial value', config.initialValue.toString() ?? '',
+          final result = await TextFieldAlertDialog.show(context,
+              'Edit initial value', config.initialValue.toString() ?? '',
               inputType: TextInputType.number);
           if (result != null) {
             final intResult = int.tryParse(result);
