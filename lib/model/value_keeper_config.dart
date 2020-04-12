@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:desktop_game_helper/repository/widget_data_repository.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -29,8 +30,8 @@ class ValueKeeperConfig extends Config {
   }) : super(TYPE);
 
   @override
-  Widget build() {
-    return ValueKeeper(this);
+  Widget build(WidgetDataRepository repository, int id) {
+    return ValueKeeper(this, repository, id);
   }
 
   @override

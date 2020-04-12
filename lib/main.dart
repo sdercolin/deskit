@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:desktop_game_helper/configuration_page.dart';
 import 'package:desktop_game_helper/repository/settings_repository.dart';
+import 'package:desktop_game_helper/repository/widget_data_repository.dart';
 import 'package:desktop_game_helper/value_keeper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -66,12 +67,14 @@ class _MyHomePageState extends State<MyHomePage> {
   );
 
   final _settingsRepository = SettingsRepository();
+  final _widgetDataRepository = WidgetDataRepository();
 
   final _streamController = StreamController<Settings>.broadcast();
 
   final _slidableController = SlidableController();
 
   void _updateAsync() async {
+    await _widgetDataRepository.fetch();
     final value = await _settingsRepository.getCurrent();
     if (value == null) {
       _settingsRepository.add(default_settings);
@@ -98,7 +101,7 @@ class _MyHomePageState extends State<MyHomePage> {
           key: Key(index.toString()),
           controller: _slidableController,
           actionPane: SlidableDrawerActionPane(),
-          child: settings.configs[index].build(),
+          child: settings.configs[index].build(_widgetDataRepository, index),
           actions: <Widget>[
             IconSlideAction(
               caption: 'Remove',

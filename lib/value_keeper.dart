@@ -1,11 +1,15 @@
+import 'package:desktop_game_helper/repository/widget_data_repository.dart';
 import 'package:flutter/material.dart';
 
 import 'model/value_keeper_config.dart';
+import 'model/value_keeper_data.dart';
 
 class ValueKeeper extends StatefulWidget {
-  ValueKeeper(this.config, {Key key}) : super(key: key);
+  ValueKeeper(this.config, this.repository, this.id);
 
   final ValueKeeperConfig config;
+  final WidgetDataRepository repository;
+  final int id;
 
   @override
   _ValueKeeperState createState() {
@@ -14,33 +18,40 @@ class ValueKeeper extends StatefulWidget {
 }
 
 class _ValueKeeperState extends State<ValueKeeper> {
-  static final _counterDefault = 0;
-  var _counter = _counterDefault;
+  static final _defaultValue = ValueKeeperData.defaultValue;
+  var _value = _defaultValue;
   final _focus = FocusNode();
   var _isFocus = false;
 
   TextEditingController _textEditingController;
 
+  void _setValue(int newValue) {
+    _value = newValue;
+    widget.repository.updateAt(ValueKeeperData(newValue), widget.id);
+  }
+
   void _incrementCounter() {
     setState(() {
-      _counter += widget.config.interval;
-      _counter = ValueKeeperConfig.validateValue(_counter);
-      _refreshCounterDisplay();
+      var newValue = _value + widget.config.interval;
+      newValue = ValueKeeperConfig.validateValue(newValue);
+      _setValue(newValue);
+      _refresh();
       _focus.unfocus();
     });
   }
 
   void _decrementCounter() {
     setState(() {
-      _counter -= widget.config.interval;
-      _counter = ValueKeeperConfig.validateValue(_counter);
-      _refreshCounterDisplay();
+      var newValue = _value - widget.config.interval;
+      newValue = ValueKeeperConfig.validateValue(newValue);
+      _setValue(newValue);
+      _refresh();
       _focus.unfocus();
     });
   }
 
-  void _refreshCounterDisplay() {
-    _textEditingController.text = _counter.toString();
+  void _refresh() {
+    _textEditingController.text = _value.toString();
   }
 
   void _onFocusChange() {
@@ -48,22 +59,33 @@ class _ValueKeeperState extends State<ValueKeeper> {
       _isFocus = _focus.hasFocus;
       if (!_isFocus) {
         if (_textEditingController.text.isEmpty) {
-          _counter = _counterDefault;
+          _setValue(_defaultValue);
         } else {
           var parsedValue = int.tryParse(_textEditingController.text);
           if (parsedValue != null) {
-            _counter = ValueKeeperConfig.validateValue(parsedValue);
+            _setValue(ValueKeeperConfig.validateValue(parsedValue));
           }
         }
-        _refreshCounterDisplay();
+        _refresh();
       }
     });
   }
 
   @override
   void initState() {
-    _textEditingController = TextEditingController(text: _counter.toString());
+    _textEditingController = TextEditingController(text: _value.toString());
     _focus.addListener(_onFocusChange);
+    final data = widget.repository.get(widget.id);
+    if (data != null) {
+      if (data is ValueKeeperData) {
+        _value = data.value;
+        _refresh();
+      } else {
+        widget.repository.updateAt(ValueKeeperData(_value), widget.id);
+      }
+    } else {
+      widget.repository.addAt(ValueKeeperData(_value), widget.id);
+    }
     super.initState();
   }
 
@@ -118,7 +140,7 @@ class _ValueKeeperState extends State<ValueKeeper> {
                     focusNode: _focus,
                     decoration: InputDecoration(
                         border: OutlineInputBorder(),
-                        hintText: _counterDefault.toString()),
+                        hintText: _defaultValue.toString()),
                   ),
                 ),
               ),
@@ -143,7 +165,7 @@ class _ValueKeeperState extends State<ValueKeeper> {
                   focusNode: _focus,
                   decoration: InputDecoration(
                       border: OutlineInputBorder(),
-                      hintText: _counterDefault.toString()),
+                      hintText: _defaultValue.toString()),
                 ),
               ),
               minusButton,

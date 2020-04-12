@@ -31,7 +31,7 @@ class ConfigurationPageState extends State<ConfigurationPage> {
 
     currentConfig ??= args.originalConfig.copy();
 
-    final preview = currentConfig.build();
+    final preview = currentConfig.build(null, null);
     final list = currentConfig.buildEditList(this);
     title ??= list.title;
     return Scaffold(

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:desktop_game_helper/model/value_keeper_config.dart';
+import 'package:desktop_game_helper/repository/widget_data_repository.dart';
 import 'package:flutter/cupertino.dart';
 
 import '../configuration_page.dart';
@@ -10,7 +11,7 @@ abstract class Config {
 
   Config(this.type);
 
-  Widget build();
+  Widget build(WidgetDataRepository repository, int id);
 
   String getEditPageTitle();
 
