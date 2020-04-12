@@ -80,6 +80,8 @@ class _ValueKeeperState extends State<ValueKeeper> {
     int input;
     if (inputText != null) {
       input = int.tryParse(inputText);
+    } else {
+      return null;
     }
     if (input != null && input > 0) {
       return input;
