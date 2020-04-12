@@ -1,6 +1,7 @@
 import 'dart:async';
 
-import 'package:desktop_game_helper/configuration_page.dart';
+import 'package:desktop_game_helper/add_widget_page.dart';
+import 'package:desktop_game_helper/edit_widget_page.dart';
 import 'package:desktop_game_helper/repository/settings_repository.dart';
 import 'package:desktop_game_helper/repository/widget_data_repository.dart';
 import 'package:desktop_game_helper/value_keeper.dart';
@@ -33,7 +34,8 @@ class MyApp extends StatelessWidget {
         ),
         home: MyHomePage(title: title),
         routes: {
-          ConfigurationPage.routeName: (context) => ConfigurationPage(),
+          EditWidgetPage.routeName: (context) => EditWidgetPage(),
+          AddWidgetPage.routeName: (context) => AddWidgetPage(),
         },
       ),
     );
@@ -53,14 +55,18 @@ class _MyHomePageState extends State<MyHomePage> {
   final default_settings = Settings.build(
     0,
     [
-      ValueKeeperConfig(ValueKeeperStyle.LARGE),
-      ValueKeeperConfig(ValueKeeperStyle.SMALL),
-      ValueKeeperConfig(ValueKeeperStyle.LARGE,
+      ValueKeeperConfig(style: ValueKeeperStyle.LARGE),
+      ValueKeeperConfig(style: ValueKeeperStyle.SMALL),
+      ValueKeeperConfig(
+          style: ValueKeeperStyle.LARGE,
           displayInterval: true,
           interval: 100,
           name: 'counter 3 counter 3 counter 3 counter 3 counter 3 counter 3'),
-      ValueKeeperConfig(ValueKeeperStyle.SMALL,
-          displayInterval: true, interval: 100, name: 'counter 4'),
+      ValueKeeperConfig(
+          style: ValueKeeperStyle.SMALL,
+          displayInterval: true,
+          interval: 100,
+          name: 'counter 4'),
     ],
     'default',
     true,
@@ -82,6 +88,70 @@ class _MyHomePageState extends State<MyHomePage> {
       _streamController.add(default_settings);
     } else {
       _streamController.add(value);
+    }
+  }
+
+  void _showRemoveConfirmDialog(BuildContext context, int index) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text('Remove widget'),
+        content: Text('Are you sure to remove this widget?'),
+        actions: <Widget>[
+          FlatButton(
+            child: Text('Cancel'),
+            onPressed: () => Navigator.pop(context),
+          ),
+          FlatButton(
+            child: Text('Remove'),
+            onPressed: () async {
+              final current = await _settingsRepository.getCurrent();
+              final edited = current.removeConfigItemAt(index);
+              await _settingsRepository.update(edited);
+              Navigator.pop(context);
+              _updateAsync();
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _editWidget(BuildContext context, Settings settings, int index) async {
+    final result = await Navigator.pushNamed(
+      context,
+      EditWidgetPage.routeName,
+      arguments: EditWidgetPageArguments(settings.configs[index]),
+    );
+
+    if (result != null) {
+      final current = await _settingsRepository.getCurrent();
+      final configs = current.configs.toList();
+      configs[index] = result;
+      final edited = current.copy(configs: configs);
+      await _settingsRepository.update(edited);
+      await _updateAsync();
+
+      Scaffold.of(context)
+        ..removeCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text('You have edited a widget.')));
+    }
+  }
+
+  void _addWidget(BuildContext context) async {
+    final result = await Navigator.pushNamed(context, AddWidgetPage.routeName);
+    if (result != null) {
+      final current = await _settingsRepository.getCurrent();
+      final configs = current.configs.toList();
+      configs.add(result);
+      final edited = current.copy(configs: configs);
+      await _settingsRepository.update(edited);
+      await _updateAsync();
+
+      Scaffold.of(context)
+        ..removeCurrentSnackBar()
+        ..showSnackBar(
+            SnackBar(content: Text('You have successfully added a widget.')));
     }
   }
 
@@ -107,56 +177,13 @@ class _MyHomePageState extends State<MyHomePage> {
               caption: 'Remove',
               color: Colors.red,
               icon: Icons.delete,
-              onTap: () => showDialog(
-                context: context,
-                builder: (_) => AlertDialog(
-                  title: Text('Remove widget'),
-                  content: Text('Are you sure to remove this widget?'),
-                  actions: <Widget>[
-                    FlatButton(
-                      child: Text('Cancel'),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                    FlatButton(
-                      child: Text('Remove'),
-                      onPressed: () async {
-                        final current = await _settingsRepository.getCurrent();
-                        final edited = current.removeConfigItemAt(index);
-                        await _settingsRepository.update(edited);
-                        Navigator.pop(context);
-                        _updateAsync();
-                      },
-                    ),
-                  ],
-                ),
-              ),
+              onTap: () => _showRemoveConfirmDialog(context, index),
             ),
             IconSlideAction(
               caption: 'Edit',
               color: Colors.amber,
               icon: Icons.settings,
-              onTap: () async {
-                final result = await Navigator.pushNamed(
-                  context,
-                  ConfigurationPage.routeName,
-                  arguments:
-                      ConfigurationPageArguments(settings.configs[index]),
-                );
-
-                if (result != null) {
-                  final current = await _settingsRepository.getCurrent();
-                  final configs = current.configs.toList();
-                  configs[index] = result;
-                  final edited = current.copy(configs: configs);
-                  await _settingsRepository.update(edited);
-                  await _updateAsync();
-
-                  Scaffold.of(context)
-                    ..removeCurrentSnackBar()
-                    ..showSnackBar(
-                        SnackBar(content: Text('Configuration edited.')));
-                }
-              },
+              onTap: () => _editWidget(context, settings, index),
             ),
           ],
         );
@@ -174,6 +201,13 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
+        actions: <Widget>[
+          Builder(
+              builder: (context) => IconButton(
+                    icon: Icon(Icons.add),
+                    onPressed: () => _addWidget(context),
+                  )),
+        ],
       ),
       backgroundColor: Color.alphaBlend(Colors.black12, Colors.white),
       body: StreamBuilder(

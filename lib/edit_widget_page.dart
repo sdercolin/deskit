@@ -6,17 +6,17 @@ import 'package:flutter/rendering.dart';
 
 import 'common/text_edit_alert_dialog.dart';
 import 'consts/style.dart';
+import 'model/widget_type_info.dart';
 
-class ConfigurationPage extends StatefulWidget {
-  static const routeName = '/configure';
+class EditWidgetPage extends StatefulWidget {
+  static const routeName = '/editWidget';
 
   @override
-  ConfigurationPageState createState() => ConfigurationPageState();
+  EditWidgetPageState createState() => EditWidgetPageState();
 }
 
-class ConfigurationPageState extends State<ConfigurationPage> {
+class EditWidgetPageState extends State<EditWidgetPage> {
   Config currentConfig;
-  String title;
 
   void update(Function() updateFunction) {
     setState(() {
@@ -26,14 +26,16 @@ class ConfigurationPageState extends State<ConfigurationPage> {
 
   @override
   Widget build(BuildContext context) {
-    final ConfigurationPageArguments args =
+    final EditWidgetPageArguments args =
         ModalRoute.of(context).settings.arguments;
 
     currentConfig ??= args.originalConfig.copy();
 
     final preview = currentConfig.build(null, null);
     final list = currentConfig.buildEditList(this);
-    title ??= list.title;
+    final typeName = currentConfig.typeInfo.name;
+    final title =
+        args.isNew ? 'Add widget: $typeName' : 'Edit widget: $typeName';
     return Scaffold(
       appBar: AppBar(
         title: Text(title),
@@ -60,19 +62,18 @@ class ConfigurationPageState extends State<ConfigurationPage> {
   }
 }
 
-class ConfigurationPageArguments {
+class EditWidgetPageArguments {
   final Config originalConfig;
+  final bool isNew;
 
-  ConfigurationPageArguments(this.originalConfig);
+  EditWidgetPageArguments(this.originalConfig, {this.isNew = false});
 }
 
 abstract class ConfigEditList<T extends Config> extends StatelessWidget {
   final T originalConfig;
-  final String title;
-  final ConfigurationPageState parentState;
+  final EditWidgetPageState parentState;
 
-  ConfigEditList(this.originalConfig, this.parentState)
-      : title = originalConfig.getEditPageTitle();
+  ConfigEditList(this.originalConfig, this.parentState);
 
   List<Widget> buildList(BuildContext context, T config);
 
@@ -114,7 +115,7 @@ abstract class ConfigEditList<T extends Config> extends StatelessWidget {
 
 class ValueKeeperConfigEditList extends ConfigEditList<ValueKeeperConfig> {
   ValueKeeperConfigEditList(
-      Config originalConfig, ConfigurationPageState parentState)
+      Config originalConfig, EditWidgetPageState parentState)
       : super(originalConfig, parentState);
 
   @override

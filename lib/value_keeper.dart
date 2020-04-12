@@ -27,7 +27,7 @@ class _ValueKeeperState extends State<ValueKeeper> {
 
   void _setValue(int newValue) {
     _value = newValue;
-    widget.repository.updateAt(ValueKeeperData(newValue), widget.id);
+    widget.repository?.updateAt(ValueKeeperData(newValue), widget.id);
   }
 
   void _incrementCounter() {
@@ -75,16 +75,16 @@ class _ValueKeeperState extends State<ValueKeeper> {
   void initState() {
     _textEditingController = TextEditingController(text: _value.toString());
     _focus.addListener(_onFocusChange);
-    final data = widget.repository.get(widget.id);
+    final data = widget.repository?.get(widget.id);
     if (data != null) {
       if (data is ValueKeeperData) {
         _value = data.value;
         _refresh();
       } else {
-        widget.repository.updateAt(ValueKeeperData(_value), widget.id);
+        widget.repository?.updateAt(ValueKeeperData(_value), widget.id);
       }
     } else {
-      widget.repository.addAt(ValueKeeperData(_value), widget.id);
+      widget.repository?.addAt(ValueKeeperData(_value), widget.id);
     }
     super.initState();
   }

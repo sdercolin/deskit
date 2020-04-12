@@ -1,10 +1,11 @@
 import 'dart:convert';
 
+import 'package:desktop_game_helper/model/widget_type_info.dart';
 import 'package:desktop_game_helper/repository/widget_data_repository.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-import '../configuration_page.dart';
+import '../edit_widget_page.dart';
 import '../value_keeper.dart';
 import 'config.dart';
 
@@ -14,6 +15,9 @@ part 'value_keeper_config.g.dart';
 class ValueKeeperConfig extends Config {
   static const TYPE = 'ValueKeeper';
 
+  @override
+  final typeInfo = WidgetTypeInfo.VALUE_KEEPER;
+
   static const maxInterval = 10000;
   static const _maxAbsoluteValue = 99999999;
 
@@ -22,8 +26,8 @@ class ValueKeeperConfig extends Config {
   bool displayInterval;
   String name;
 
-  ValueKeeperConfig(
-    this.style, {
+  ValueKeeperConfig({
+    this.style = ValueKeeperStyle.LARGE,
     this.interval = 1,
     this.displayInterval = false,
     this.name = '',
@@ -35,11 +39,7 @@ class ValueKeeperConfig extends Config {
   }
 
   @override
-  String getEditPageTitle() =>
-      'Configure value keeper' + (name?.isNotEmpty == true ? ': $name' : '');
-
-  @override
-  ConfigEditList buildEditList(ConfigurationPageState parentState) =>
+  ConfigEditList buildEditList(EditWidgetPageState parentState) =>
       ValueKeeperConfigEditList(this, parentState);
 
   factory ValueKeeperConfig.fromJson(String json) =>
