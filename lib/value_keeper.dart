@@ -22,6 +22,7 @@ class _ValueKeeperState extends State<ValueKeeper> {
   void _incrementCounter() {
     setState(() {
       _counter += widget.config.interval;
+      _counter = ValueKeeperConfig.validateValue(_counter);
       _refreshCounterDisplay();
       _focus.unfocus();
     });
@@ -30,6 +31,7 @@ class _ValueKeeperState extends State<ValueKeeper> {
   void _decrementCounter() {
     setState(() {
       _counter -= widget.config.interval;
+      _counter = ValueKeeperConfig.validateValue(_counter);
       _refreshCounterDisplay();
       _focus.unfocus();
     });
@@ -47,7 +49,9 @@ class _ValueKeeperState extends State<ValueKeeper> {
           _counter = _counterDefault;
         } else {
           var parsedValue = int.tryParse(_textEditingController.text);
-          if (parsedValue != null) _counter = parsedValue;
+          if (parsedValue != null) {
+            _counter = ValueKeeperConfig.validateValue(parsedValue);
+          }
         }
         _refreshCounterDisplay();
       }
@@ -101,7 +105,7 @@ class _ValueKeeperState extends State<ValueKeeper> {
             children: <Widget>[
               minusButton,
               SizedBox(
-                width: 150,
+                width: 200,
                 child: Padding(
                   padding: EdgeInsets.all(20),
                   child: TextField(

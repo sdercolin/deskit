@@ -2,6 +2,7 @@ import 'package:desktop_game_helper/model/config.dart';
 import 'package:desktop_game_helper/model/value_keeper_config.dart';
 import 'package:desktop_game_helper/value_keeper.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
 import 'common/text_edit_alert_dialog.dart';
 import 'consts/style.dart';
@@ -118,10 +119,11 @@ class ValueKeeperConfigEditList extends ConfigEditList<ValueKeeperConfig> {
 
   @override
   List<Widget> buildList(BuildContext context, ValueKeeperConfig config) {
-    final itemPadding = EdgeInsets.symmetric(horizontal: 20, vertical: 13);
+    final itemPadding = EdgeInsets.symmetric(horizontal: 20);
 
     return [
-      Padding(
+      Container(
+        constraints: BoxConstraints(minHeight: 70),
         padding: itemPadding,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -153,7 +155,8 @@ class ValueKeeperConfigEditList extends ConfigEditList<ValueKeeperConfig> {
         ),
       ),
       InkWell(
-        child: Padding(
+        child: Container(
+          constraints: BoxConstraints(minHeight: 60),
           padding: itemPadding,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -188,6 +191,47 @@ class ValueKeeperConfigEditList extends ConfigEditList<ValueKeeperConfig> {
             parentState.update(() {
               config.name = result;
             });
+          }
+        },
+      ),
+      InkWell(
+        child: Container(
+          constraints: BoxConstraints(minHeight: 60),
+          padding: itemPadding,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Container(
+                child: Text(
+                  'Interval',
+                  textAlign: TextAlign.left,
+                  style: Style.PreferenceTitle,
+                ),
+              ),
+              Container(
+                child: Text(config.interval.toString()),
+              ),
+            ],
+          ),
+        ),
+        onTap: () async {
+          final result = await TextFieldAlertDialog.show(
+              context, 'Edit interval', config.interval.toString() ?? '',
+              inputType: TextInputType.number);
+          if (result != null) {
+            final intResult = int.tryParse(result);
+            final max = ValueKeeperConfig.maxInterval;
+            if (intResult != null && intResult > 0 && intResult <= max) {
+              parentState.update(() {
+                config.interval = intResult;
+              });
+            } else {
+              Scaffold.of(context)
+                ..removeCurrentSnackBar()
+                ..showSnackBar(SnackBar(
+                    content: Text(
+                        'Interval should be an integer between 1 and $max.')));
+            }
           }
         },
       ),

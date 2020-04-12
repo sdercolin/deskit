@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 
 class TextFieldAlertDialog {
-  static Future<String> show(BuildContext context, String title,
-      String initialValue) {
+  static Future<String> show(
+    BuildContext context,
+    String title,
+    String initialValue, {
+    TextInputType inputType,
+  }) {
     final _controller = TextEditingController(text: initialValue);
     return showDialog<String>(
       context: context,
@@ -12,10 +16,12 @@ class TextFieldAlertDialog {
           content: Row(
             children: <Widget>[
               Expanded(
-                  child: TextField(
-                    controller: _controller,
-                    autofocus: true
-                  ))
+                child: TextField(
+                  controller: _controller,
+                  autofocus: true,
+                  keyboardType: inputType,
+                ),
+              ),
             ],
           ),
           actions: <Widget>[

@@ -12,6 +12,10 @@ part 'value_keeper_config.g.dart';
 @JsonSerializable(nullable: false)
 class ValueKeeperConfig extends Config {
   static const TYPE = 'ValueKeeper';
+
+  static const maxInterval = 10000;
+  static const _maxAbsoluteValue = 99999999;
+
   ValueKeeperStyle style;
   int interval;
   bool displayInterval;
@@ -40,4 +44,14 @@ class ValueKeeperConfig extends Config {
 
   @override
   String toJson() => jsonEncode(_$ValueKeeperConfigToJson(this));
+
+  static int validateValue(int value) {
+    if (value > _maxAbsoluteValue) {
+      return _maxAbsoluteValue;
+    } else if (value < -_maxAbsoluteValue) {
+      return -_maxAbsoluteValue;
+    } else {
+      return value;
+    }
+  }
 }
