@@ -29,7 +29,9 @@ class ValueKeeperConfig extends Config {
   }) : super(TYPE);
 
   @override
-  Widget build() => ValueKeeper(this);
+  Widget build() {
+    return ValueKeeper(this);
+  }
 
   @override
   String getEditPageTitle() =>

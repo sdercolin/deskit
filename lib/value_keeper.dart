@@ -8,7 +8,9 @@ class ValueKeeper extends StatefulWidget {
   final ValueKeeperConfig config;
 
   @override
-  _ValueKeeperState createState() => _ValueKeeperState();
+  _ValueKeeperState createState() {
+    return _ValueKeeperState();
+  }
 }
 
 class _ValueKeeperState extends State<ValueKeeper> {

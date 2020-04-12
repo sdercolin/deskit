@@ -120,10 +120,11 @@ class ValueKeeperConfigEditList extends ConfigEditList<ValueKeeperConfig> {
   @override
   List<Widget> buildList(BuildContext context, ValueKeeperConfig config) {
     final itemPadding = EdgeInsets.symmetric(horizontal: 20);
+    final itemConstraints = BoxConstraints(minHeight: 60);
 
     return [
       Container(
-        constraints: BoxConstraints(minHeight: 70),
+        constraints: itemConstraints,
         padding: itemPadding,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -156,7 +157,7 @@ class ValueKeeperConfigEditList extends ConfigEditList<ValueKeeperConfig> {
       ),
       InkWell(
         child: Container(
-          constraints: BoxConstraints(minHeight: 60),
+          constraints: itemConstraints,
           padding: itemPadding,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -196,7 +197,7 @@ class ValueKeeperConfigEditList extends ConfigEditList<ValueKeeperConfig> {
       ),
       InkWell(
         child: Container(
-          constraints: BoxConstraints(minHeight: 60),
+          constraints: itemConstraints,
           padding: itemPadding,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -234,6 +235,32 @@ class ValueKeeperConfigEditList extends ConfigEditList<ValueKeeperConfig> {
             }
           }
         },
+      ),
+      Container(
+        constraints: itemConstraints,
+        padding: itemPadding,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Container(
+              child: Text(
+                'Display interval',
+                textAlign: TextAlign.left,
+                style: Style.PreferenceTitle,
+              ),
+            ),
+            Container(
+              child: Checkbox(
+                value: config.displayInterval,
+                onChanged: (value) {
+                  parentState.update(() {
+                    config.displayInterval = value;
+                  });
+                },
+              ),
+            ),
+          ],
+        ),
       ),
       SizedBox(height: 10),
     ];
