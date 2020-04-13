@@ -228,6 +228,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
+        centerTitle: true,
         actions: _reordering
             ? <Widget>[
                 Builder(

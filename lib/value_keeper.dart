@@ -213,7 +213,6 @@ class _ValueKeeperState extends State<ValueKeeper> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              resetButton,
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
@@ -227,6 +226,7 @@ class _ValueKeeperState extends State<ValueKeeper> {
                   plusButton,
                 ],
               ),
+              resetButton,
             ],
           ),
         );
