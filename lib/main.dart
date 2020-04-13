@@ -138,6 +138,21 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  void _reorderWidget(int oldIndex, int newIndex) async {
+    // update settings
+    final currentSettings = await _settingsRepository.getCurrent();
+    final configs = currentSettings.configs.toList();
+    final moved = configs.removeAt(oldIndex);
+    configs.insert(newIndex, moved);
+    final editedSettings = currentSettings.copy(configs: configs);
+    await _settingsRepository.update(editedSettings);
+
+    // update data
+    await _widgetDataRepository.reorder(oldIndex, newIndex);
+
+    await _updateAsync();
+  }
+
   void _addWidget(BuildContext context) async {
     final result = await Navigator.pushNamed(context, AddWidgetPage.routeName);
     if (result != null) {
@@ -159,37 +174,49 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _buildList(Settings settings) {
-    return ListView.separated(
-      itemBuilder: (context, index) {
-        if (settings.configs.length <= index) {
-          return null;
+    final items = <Widget>[];
+    settings.configs.asMap().forEach((index, config) {
+      items.add(Wrap(
+        key: Key(index.toString()),
+        children: [
+          Slidable(
+            controller: _slidableController,
+            actionPane: SlidableDrawerActionPane(),
+            child: Column(
+              children: <Widget>[
+                config.build(_widgetDataRepository, index),
+                Divider(
+                  height: 0.3,
+                  color: Color.alphaBlend(Colors.white70, Colors.grey),
+                ),
+              ],
+            ),
+            actions: <Widget>[
+              IconSlideAction(
+                caption: 'Remove',
+                color: Colors.red,
+                icon: Icons.delete,
+                onTap: () => _showRemoveConfirmDialog(context, index),
+              ),
+              IconSlideAction(
+                caption: 'Edit',
+                color: Colors.amber,
+                icon: Icons.settings,
+                onTap: () => _editWidget(context, settings, index),
+              ),
+            ],
+          )
+        ],
+      ));
+    });
+    return ReorderableListView(
+      onReorder: (int oldIndex, int newIndex) {
+        if (oldIndex < newIndex) {
+          newIndex -= 1;
         }
-        return Slidable(
-          key: Key(index.toString()),
-          controller: _slidableController,
-          actionPane: SlidableDrawerActionPane(),
-          child: settings.configs[index].build(_widgetDataRepository, index),
-          actions: <Widget>[
-            IconSlideAction(
-              caption: 'Remove',
-              color: Colors.red,
-              icon: Icons.delete,
-              onTap: () => _showRemoveConfirmDialog(context, index),
-            ),
-            IconSlideAction(
-              caption: 'Edit',
-              color: Colors.amber,
-              icon: Icons.settings,
-              onTap: () => _editWidget(context, settings, index),
-            ),
-          ],
-        );
+        _reorderWidget(oldIndex, newIndex);
       },
-      itemCount: settings.configs.length,
-      separatorBuilder: (_, __) => Divider(
-        height: 0.3,
-        color: Color.alphaBlend(Colors.white70, Colors.grey),
-      ),
+      children: items,
     );
   }
 

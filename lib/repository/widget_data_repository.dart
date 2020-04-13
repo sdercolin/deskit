@@ -44,16 +44,31 @@ class WidgetDataRepository {
   void removeAt(int index) async {
     final dao = await this.dao;
     final all = await dao.getAll();
-    final removed = all.toList();
-    removed.removeAt(index);
-    final edited = <WidgetDataEntity>[];
-    var id = 0;
-    for (var item in removed) {
-      edited.add(WidgetDataEntity(id, item.dataText));
-      id++;
-    }
+    final edited = all.toList();
+    edited.removeAt(index);
+    _rearrangeIds(edited);
     await dao.deleteAll(all);
     await dao.addAll(edited);
     await fetch();
+  }
+
+  void reorder(int oldIndex, int newIndex) async {
+    final dao = await this.dao;
+    final all = await dao.getAll();
+    final edited = all.toList();
+    final reorderedItem = edited.removeAt(oldIndex);
+    edited.insert(newIndex, reorderedItem);
+    _rearrangeIds(edited);
+    await dao.deleteAll(all);
+    await dao.addAll(edited);
+    await fetch();
+  }
+
+  void _rearrangeIds(List<WidgetDataEntity> list) {
+    final copy = list.toList();
+    list.clear();
+    copy.asMap().forEach((index, value) {
+      list.add(WidgetDataEntity(index, value.dataText));
+    });
   }
 }
