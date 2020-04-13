@@ -1,6 +1,6 @@
-import 'package:desktop_game_helper/model/widget_data.dart';
-import 'package:desktop_game_helper/repository/app_database.dart';
-import 'package:desktop_game_helper/repository/widget_data_dao.dart';
+import 'package:deskit/model/widget_data.dart';
+import 'package:deskit/repository/app_database.dart';
+import 'package:deskit/repository/widget_data_dao.dart';
 
 class WidgetDataRepository {
   Future<WidgetDataDao> get dao async {

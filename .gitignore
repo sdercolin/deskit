@@ -44,3 +44,5 @@ app.*.map.json
 
 # Generated code
 **/*.g.dart
+key.properties
+outputs

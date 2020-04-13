@@ -1,5 +1,5 @@
-import 'package:desktop_game_helper/model/settings.dart';
-import 'package:desktop_game_helper/model/value_keeper_config.dart';
+import 'package:deskit/model/settings.dart';
+import 'package:deskit/model/value_keeper_config.dart';
 
 import '../value_keeper.dart';
 

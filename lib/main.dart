@@ -1,11 +1,11 @@
 import 'dart:async';
 
-import 'package:desktop_game_helper/add_widget_page.dart';
-import 'package:desktop_game_helper/common/snack_bar_util.dart';
-import 'package:desktop_game_helper/consts/presets.dart';
-import 'package:desktop_game_helper/edit_widget_page.dart';
-import 'package:desktop_game_helper/repository/settings_repository.dart';
-import 'package:desktop_game_helper/repository/widget_data_repository.dart';
+import 'package:deskit/add_widget_page.dart';
+import 'package:deskit/common/snack_bar_util.dart';
+import 'package:deskit/consts/presets.dart';
+import 'package:deskit/edit_widget_page.dart';
+import 'package:deskit/repository/settings_repository.dart';
+import 'package:deskit/repository/widget_data_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 

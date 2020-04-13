@@ -1,7 +1,7 @@
-import 'package:desktop_game_helper/common/snack_bar_util.dart';
-import 'package:desktop_game_helper/model/config.dart';
-import 'package:desktop_game_helper/model/value_keeper_config.dart';
-import 'package:desktop_game_helper/value_keeper.dart';
+import 'package:deskit/common/snack_bar_util.dart';
+import 'package:deskit/model/config.dart';
+import 'package:deskit/model/value_keeper_config.dart';
+import 'package:deskit/value_keeper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 

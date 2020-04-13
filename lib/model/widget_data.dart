@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:desktop_game_helper/model/value_keeper_data.dart';
+import 'package:deskit/model/value_keeper_data.dart';
 import 'package:floor/floor.dart';
 
 abstract class WidgetData {

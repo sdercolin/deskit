@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:desktop_game_helper/model/config.dart';
+import 'package:deskit/model/config.dart';
 import 'package:floor/floor.dart';
 
 @entity

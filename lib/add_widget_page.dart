@@ -1,4 +1,4 @@
-import 'package:desktop_game_helper/model/widget_type_info.dart';
+import 'package:deskit/model/widget_type_info.dart';
 import 'package:flutter/material.dart';
 
 import 'edit_widget_page.dart';

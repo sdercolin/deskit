@@ -1,4 +1,4 @@
-package com.sdercolin.desktop_game_helper
+package com.sdercolin.deskit
 
 import io.flutter.embedding.android.FlutterActivity
 

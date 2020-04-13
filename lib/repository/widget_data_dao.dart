@@ -1,4 +1,4 @@
-import 'package:desktop_game_helper/model/widget_data.dart';
+import 'package:deskit/model/widget_data.dart';
 import 'package:floor/floor.dart';
 
 @dao

@@ -1,6 +1,6 @@
-import 'package:desktop_game_helper/common/snack_bar_util.dart';
-import 'package:desktop_game_helper/common/text_edit_alert_dialog.dart';
-import 'package:desktop_game_helper/repository/widget_data_repository.dart';
+import 'package:deskit/common/snack_bar_util.dart';
+import 'package:deskit/common/text_edit_alert_dialog.dart';
+import 'package:deskit/repository/widget_data_repository.dart';
 import 'package:flutter/material.dart';
 
 import 'model/value_keeper_config.dart';

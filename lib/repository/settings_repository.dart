@@ -1,6 +1,6 @@
-import 'package:desktop_game_helper/model/settings.dart';
-import 'package:desktop_game_helper/repository/app_database.dart';
-import 'package:desktop_game_helper/repository/settings_dao.dart';
+import 'package:deskit/model/settings.dart';
+import 'package:deskit/repository/app_database.dart';
+import 'package:deskit/repository/settings_dao.dart';
 
 class SettingsRepository {
   Future<SettingsDao> get dao async {

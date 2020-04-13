@@ -1,5 +1,5 @@
-import 'package:desktop_game_helper/model/config.dart';
-import 'package:desktop_game_helper/model/value_keeper_config.dart';
+import 'package:deskit/model/config.dart';
+import 'package:deskit/model/value_keeper_config.dart';
 
 enum WidgetTypeInfo {
   VALUE_KEEPER,
