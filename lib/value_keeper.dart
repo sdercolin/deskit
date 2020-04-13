@@ -229,7 +229,7 @@ class _ValueKeeperState extends State<ValueKeeper> {
         break;
       case ValueKeeperStyle.LARGE:
         body = Container(
-          padding: EdgeInsets.only(top: 10, bottom: 10, left: 60, right: 10),
+          padding: EdgeInsets.only(top: 5, bottom: 5, left: 60, right: 10),
           child: Row(
             children: <Widget>[
               Expanded(
@@ -302,7 +302,7 @@ extension ValueKeeperStyleExtension on ValueKeeperStyle {
       case ValueKeeperStyle.SMALL:
         return Icons.arrow_right;
       case ValueKeeperStyle.LARGE:
-        return Icons.arrow_drop_up;
+        return Icons.keyboard_arrow_up;
       default:
         return null;
     }
@@ -313,7 +313,7 @@ extension ValueKeeperStyleExtension on ValueKeeperStyle {
       case ValueKeeperStyle.SMALL:
         return Icons.arrow_left;
       case ValueKeeperStyle.LARGE:
-        return Icons.arrow_drop_down;
+        return Icons.keyboard_arrow_down;
       default:
         return null;
     }
@@ -322,9 +322,9 @@ extension ValueKeeperStyleExtension on ValueKeeperStyle {
   double get arrowButtonSize {
     switch (this) {
       case ValueKeeperStyle.SMALL:
-        return 40;
+        return 30;
       case ValueKeeperStyle.LARGE:
-        return 50;
+        return 35;
       default:
         return null;
     }
