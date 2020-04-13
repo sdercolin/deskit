@@ -8,6 +8,7 @@ import 'package:deskit/edit_widget_page.dart';
 import 'package:deskit/repository/settings_repository.dart';
 import 'package:deskit/repository/widget_data_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
 import 'common/focus_util.dart';
@@ -21,6 +22,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final title = 'Deskit';
+
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+    ]);
+
     return GestureDetector(
       onTap: () {
         FocusUtil.unfocusAll(context);
