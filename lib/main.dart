@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:desktop_game_helper/add_widget_page.dart';
+import 'package:desktop_game_helper/common/snack_bar_util.dart';
 import 'package:desktop_game_helper/edit_widget_page.dart';
 import 'package:desktop_game_helper/repository/settings_repository.dart';
 import 'package:desktop_game_helper/repository/widget_data_repository.dart';
@@ -133,9 +134,7 @@ class _MyHomePageState extends State<MyHomePage> {
       await _settingsRepository.update(edited);
       await _updateAsync();
 
-      Scaffold.of(context)
-        ..removeCurrentSnackBar()
-        ..showSnackBar(SnackBar(content: Text('You have edited a widget.')));
+      SnackBarUtil.show(context, 'You have edited a widget.');
     }
   }
 
@@ -149,10 +148,7 @@ class _MyHomePageState extends State<MyHomePage> {
       await _settingsRepository.update(edited);
       await _updateAsync();
 
-      Scaffold.of(context)
-        ..removeCurrentSnackBar()
-        ..showSnackBar(
-            SnackBar(content: Text('You have successfully added a widget.')));
+      SnackBarUtil.show(context, 'You have successfully added a widget.');
     }
   }
 

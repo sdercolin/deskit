@@ -1,3 +1,4 @@
+import 'package:desktop_game_helper/common/snack_bar_util.dart';
 import 'package:desktop_game_helper/common/text_edit_alert_dialog.dart';
 import 'package:desktop_game_helper/repository/widget_data_repository.dart';
 import 'package:flutter/material.dart';
@@ -86,12 +87,17 @@ class _ValueKeeperState extends State<ValueKeeper> {
     if (input != null && input > 0) {
       return input;
     } else {
-      Scaffold.of(context)
-        ..removeCurrentSnackBar()
-        ..showSnackBar(
-            SnackBar(content: Text('You should input a positive integer.')));
+      SnackBarUtil.show(context, 'You should input a positive integer.');
       return null;
     }
+  }
+
+  void _reset() {
+    setState(() {
+      _setValue(_defaultValue);
+      _refresh();
+      _focus.unfocus();
+    });
   }
 
   void _refresh() {
@@ -177,56 +183,69 @@ class _ValueKeeperState extends State<ValueKeeper> {
       );
     }
 
+    final resetButton = InkWell(
+      child: Icon(Icons.refresh, size: config.style.resetButtonSize),
+      onTap: () => SnackBarUtil.show(
+          context, 'Long press this button to reset the widget.'),
+      onLongPress: _reset,
+    );
+
+    final textField = TextField(
+      style: config.style.getTextFieldStyle(context),
+      textAlign: TextAlign.center,
+      keyboardType: TextInputType.number,
+      controller: _textEditingController,
+      focusNode: _focus,
+      decoration: InputDecoration(
+          border: OutlineInputBorder(), hintText: _defaultValue.toString()),
+    );
+
     Widget body;
 
     switch (widget.config.style) {
       case ValueKeeperStyle.SMALL:
-        body = Center(
-          child: Row(
+        body = Container(
+          padding: EdgeInsets.all(10),
+          child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              minusButton,
-              SizedBox(
-                width: 200,
-                child: Padding(
-                  padding: EdgeInsets.all(20),
-                  child: TextField(
-                    style: Theme.of(context).textTheme.headline6,
-                    textAlign: TextAlign.center,
-                    keyboardType: TextInputType.number,
-                    controller: _textEditingController,
-                    focusNode: _focus,
-                    decoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                        hintText: _defaultValue.toString()),
+              resetButton,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  minusButton,
+                  Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.all(10),
+                      child: textField,
+                    ),
                   ),
-                ),
+                  plusButton,
+                ],
               ),
-              plusButton,
             ],
           ),
         );
         break;
       case ValueKeeperStyle.LARGE:
-        body = Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+        body = Container(
+          padding: EdgeInsets.only(top: 10, bottom: 10, left: 60, right: 10),
+          child: Row(
             children: <Widget>[
-              plusButton,
-              Padding(
-                padding: EdgeInsets.only(left: 70.0, right: 70.0),
-                child: TextField(
-                  style: Theme.of(context).textTheme.headline3,
-                  textAlign: TextAlign.center,
-                  keyboardType: TextInputType.number,
-                  controller: _textEditingController,
-                  focusNode: _focus,
-                  decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      hintText: _defaultValue.toString()),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    plusButton,
+                    textField,
+                    minusButton,
+                  ],
                 ),
               ),
-              minusButton,
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                child: resetButton,
+              ),
             ],
           ),
         );
@@ -322,12 +341,34 @@ extension ValueKeeperStyleExtension on ValueKeeperStyle {
     }
   }
 
+  double get resetButtonSize {
+    switch (this) {
+      case ValueKeeperStyle.SMALL:
+        return 20;
+      case ValueKeeperStyle.LARGE:
+        return 25;
+      default:
+        return null;
+    }
+  }
+
   String get displayName {
     switch (this) {
       case ValueKeeperStyle.SMALL:
         return 'Small';
       case ValueKeeperStyle.LARGE:
         return 'Large';
+      default:
+        return null;
+    }
+  }
+
+  TextStyle getTextFieldStyle(BuildContext context) {
+    switch (this) {
+      case ValueKeeperStyle.SMALL:
+        return Theme.of(context).textTheme.headline6;
+      case ValueKeeperStyle.LARGE:
+        return Theme.of(context).textTheme.headline3;
       default:
         return null;
     }

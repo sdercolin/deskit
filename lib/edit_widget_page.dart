@@ -1,3 +1,4 @@
+import 'package:desktop_game_helper/common/snack_bar_util.dart';
 import 'package:desktop_game_helper/model/config.dart';
 import 'package:desktop_game_helper/model/value_keeper_config.dart';
 import 'package:desktop_game_helper/value_keeper.dart';
@@ -230,11 +231,8 @@ class ValueKeeperConfigEditList extends ConfigEditList<ValueKeeperConfig> {
                 config.initialValue = intResult;
               });
             } else {
-              Scaffold.of(context)
-                ..removeCurrentSnackBar()
-                ..showSnackBar(SnackBar(
-                    content: Text(
-                        'Initial value should be an integer between $min and $max.')));
+              SnackBarUtil.show(context,
+                  'Initial value should be an integer between $min and $max.');
             }
           }
         },
