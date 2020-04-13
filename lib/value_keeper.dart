@@ -1,13 +1,14 @@
 import 'package:deskit/common/snack_bar_util.dart';
 import 'package:deskit/common/text_edit_alert_dialog.dart';
+import 'package:deskit/deskit_widget.dart';
 import 'package:deskit/repository/widget_data_repository.dart';
 import 'package:flutter/material.dart';
 
 import 'model/value_keeper_config.dart';
 import 'model/value_keeper_data.dart';
 
-class ValueKeeper extends StatefulWidget {
-  ValueKeeper(this.config, this.repository, this.id);
+class ValueKeeper extends DeskitWidget<ValueKeeper> {
+  ValueKeeper(this.config, this.repository, this.id, key) : super(key);
 
   final ValueKeeperConfig config;
   final WidgetDataRepository repository;
@@ -19,7 +20,7 @@ class ValueKeeper extends StatefulWidget {
   }
 }
 
-class _ValueKeeperState extends State<ValueKeeper> {
+class _ValueKeeperState extends DeskitWidgetState<ValueKeeper> {
   var _defaultValue;
   var _value;
   final _focus = FocusNode();
@@ -92,7 +93,8 @@ class _ValueKeeperState extends State<ValueKeeper> {
     }
   }
 
-  void _reset() {
+  @override
+  void reset() {
     setState(() {
       _setValue(_defaultValue);
       _refresh();
@@ -191,7 +193,7 @@ class _ValueKeeperState extends State<ValueKeeper> {
       child: Icon(Icons.refresh, size: config.style.resetButtonSize),
       onTap: () => SnackBarUtil.show(
           context, 'Long press this button to reset the widget.'),
-      onLongPress: _reset,
+      onLongPress: reset,
     );
 
     final textField = TextField(

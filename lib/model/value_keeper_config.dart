@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:deskit/deskit_widget.dart';
 import 'package:deskit/model/widget_type_info.dart';
 import 'package:deskit/repository/widget_data_repository.dart';
 import 'package:flutter/cupertino.dart';
@@ -38,8 +39,8 @@ class ValueKeeperConfig extends Config {
   }) : super(TYPE);
 
   @override
-  Widget build(WidgetDataRepository repository, int id) {
-    return ValueKeeper(this, repository, id);
+  DeskitWidget build(WidgetDataRepository repository, int id, GlobalKey key) {
+    return ValueKeeper(this, repository, id, key);
   }
 
   @override

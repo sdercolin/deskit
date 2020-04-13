@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:deskit/deskit_widget.dart';
 import 'package:deskit/model/value_keeper_config.dart';
 import 'package:deskit/model/widget_type_info.dart';
 import 'package:deskit/repository/widget_data_repository.dart';
@@ -13,7 +14,7 @@ abstract class Config {
 
   Config(this.type);
 
-  Widget build(WidgetDataRepository repository, int id);
+  DeskitWidget build(WidgetDataRepository repository, int id, GlobalKey key);
 
   ConfigEditList buildEditList(EditWidgetPageState parentState);
 

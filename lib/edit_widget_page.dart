@@ -32,7 +32,7 @@ class EditWidgetPageState extends State<EditWidgetPage> {
 
     currentConfig ??= args.originalConfig.copy();
 
-    final preview = currentConfig.build(null, null);
+    final preview = currentConfig.build(null, null, null);
     final list = currentConfig.buildEditList(this);
     final typeName = currentConfig.typeInfo.name;
     final title =

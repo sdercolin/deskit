@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:deskit/add_widget_page.dart';
 import 'package:deskit/common/snack_bar_util.dart';
 import 'package:deskit/consts/presets.dart';
+import 'package:deskit/deskit_widget.dart';
 import 'package:deskit/edit_widget_page.dart';
 import 'package:deskit/repository/settings_repository.dart';
 import 'package:deskit/repository/widget_data_repository.dart';
@@ -63,6 +64,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   final _slidableController = SlidableController();
 
+  final _myWidgetStateKeys = <GlobalKey<DeskitWidgetState>>[];
+
   void _updateAsync() async {
     await _widgetDataRepository.fetch();
     await _settingsRepository.fetch();
@@ -84,30 +87,57 @@ class _MyHomePageState extends State<MyHomePage> {
     await _settingsRepository.select(default_settings.id);
   }
 
-  void _showRemoveConfirmDialog(BuildContext context, int index) {
+  void _confirmRemoveWidget(BuildContext context, int index) {
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        title: Text('Remove widget'),
-        content: Text('Are you sure to remove this widget?'),
-        actions: <Widget>[
-          FlatButton(
-            child: Text('Cancel'),
-            onPressed: () => Navigator.pop(context),
+      builder: (_) =>
+          AlertDialog(
+            title: Text('Remove widget'),
+            content: Text('Are you sure to remove this widget?'),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('Cancel'),
+                onPressed: () => Navigator.pop(context),
+              ),
+              FlatButton(
+                child: Text('Remove'),
+                onPressed: () async {
+                  final current = _settingsRepository.getCurrent();
+                  final edited = current.removeConfigItemAt(index);
+                  await _settingsRepository.update(edited);
+                  await _widgetDataRepository.removeAt(index);
+                  Navigator.pop(context);
+                  _update();
+                },
+              ),
+            ],
           ),
-          FlatButton(
-            child: Text('Remove'),
-            onPressed: () async {
-              final current = _settingsRepository.getCurrent();
-              final edited = current.removeConfigItemAt(index);
-              await _settingsRepository.update(edited);
-              await _widgetDataRepository.removeAt(index);
-              Navigator.pop(context);
-              _update();
-            },
+    );
+  }
+
+  void _confirmResetAll(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) =>
+          AlertDialog(
+            title: Text('Reset all widgets'),
+            content: Text('Are you sure to reset all widgets?'),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('Cancel'),
+                onPressed: () => Navigator.pop(context),
+              ),
+              FlatButton(
+                child: Text('Reset'),
+                onPressed: () async {
+                  _myWidgetStateKeys.forEach((key) {
+                    key.currentState.reset();
+                  });
+                  Navigator.pop(context);
+                },
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
@@ -174,10 +204,14 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
   }
 
-  Widget _buildList(BuildContext context, Settings settings) {
-    final items = <Widget>[];
+  Widget _buildWidgets(BuildContext context, Settings settings) {
+    _myWidgetStateKeys.clear();
+    final widgetWrappers = <Widget>[];
     settings.configs.asMap().forEach((index, config) {
-      items.add(Wrap(
+      final key = GlobalKey<DeskitWidgetState>();
+      _myWidgetStateKeys.add(key);
+      final widget = config.build(_widgetDataRepository, index, key);
+      widgetWrappers.add(Wrap(
         key: Key(index.toString()),
         children: [
           Slidable(
@@ -185,7 +219,7 @@ class _MyHomePageState extends State<MyHomePage> {
             actionPane: SlidableDrawerActionPane(),
             child: Column(
               children: <Widget>[
-                config.build(_widgetDataRepository, index),
+                widget,
                 Divider(
                   height: 0.3,
                   color: Color.alphaBlend(Colors.white70, Colors.grey),
@@ -197,7 +231,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 caption: 'Remove',
                 color: Colors.red,
                 icon: Icons.delete,
-                onTap: () => _showRemoveConfirmDialog(context, index),
+                onTap: () => _confirmRemoveWidget(context, index),
               ),
               IconSlideAction(
                 caption: 'Edit',
@@ -212,15 +246,15 @@ class _MyHomePageState extends State<MyHomePage> {
     });
     return _reordering
         ? ReorderableListView(
-            onReorder: (int oldIndex, int newIndex) {
-              if (oldIndex < newIndex) {
-                newIndex -= 1;
-              }
-              _reorderWidget(oldIndex, newIndex);
-            },
-            children: items,
-          )
-        : ListView(children: items);
+      onReorder: (int oldIndex, int newIndex) {
+        if (oldIndex < newIndex) {
+          newIndex -= 1;
+        }
+        _reorderWidget(oldIndex, newIndex);
+      },
+      children: widgetWrappers,
+    )
+        : ListView(children: widgetWrappers);
   }
 
   @override
@@ -228,27 +262,36 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
-        centerTitle: true,
+        centerTitle: false,
         actions: _reordering
             ? <Widget>[
-                Builder(
-                    builder: (context) => IconButton(
-                          icon: Icon(Icons.done),
-                          onPressed: () => _toggleReordering(context),
-                        )),
-              ]
+          Builder(
+              builder: (context) =>
+                  IconButton(
+                    icon: Icon(Icons.done),
+                    onPressed: () => _toggleReordering(context),
+                  )),
+        ]
             : <Widget>[
-                Builder(
-                    builder: (context) => IconButton(
-                          icon: Icon(Icons.import_export),
-                          onPressed: () => _toggleReordering(context),
-                        )),
-                Builder(
-                    builder: (context) => IconButton(
-                          icon: Icon(Icons.add),
-                          onPressed: () => _addWidget(context),
-                        )),
-              ],
+          Builder(
+              builder: (context) =>
+                  IconButton(
+                    icon: Icon(Icons.refresh),
+                    onPressed: () => _confirmResetAll(context),
+                  )),
+          Builder(
+              builder: (context) =>
+                  IconButton(
+                    icon: Icon(Icons.import_export),
+                    onPressed: () => _toggleReordering(context),
+                  )),
+          Builder(
+              builder: (context) =>
+                  IconButton(
+                    icon: Icon(Icons.add),
+                    onPressed: () => _addWidget(context),
+                  )),
+        ],
       ),
       backgroundColor: Color.alphaBlend(Colors.black12, Colors.white),
       body: StreamBuilder(
@@ -262,7 +305,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               );
             } else {
-              return _buildList(context, snapshot.data);
+              return _buildWidgets(context, snapshot.data);
             }
           }),
     );

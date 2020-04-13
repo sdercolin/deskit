@@ -60,6 +60,11 @@ class WidgetDataRepository {
     _writeAll();
   }
 
+  void clear() async {
+    _data.clear();
+    await (await dao).clear();
+  }
+
   void _writeAll() async {
     final dao = await this.dao;
     await dao.clear();
