@@ -19,7 +19,7 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final title = 'Desktop Game Helper (devcode)';
+    final title = 'Deskit';
     return GestureDetector(
       onTap: () {
         var currentFocus = FocusScope.of(context);
@@ -53,6 +53,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  var _reordering = false;
+
   final default_settings = Settings.build(
     0,
     [
@@ -143,6 +145,16 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  void _toggleReordering(BuildContext context) {
+    setState(() {
+      _reordering = !_reordering;
+    });
+    if (_reordering) {
+      SnackBarUtil.show(
+          context, 'You can now long press widgets to reorder them.');
+    }
+  }
+
   void _reorderWidget(int oldIndex, int newIndex) {
     final currentSettings = _settingsRepository.getCurrent();
     final configs = currentSettings.configs.toList();
@@ -210,15 +222,17 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       ));
     });
-    return ReorderableListView(
-      onReorder: (int oldIndex, int newIndex) {
-        if (oldIndex < newIndex) {
-          newIndex -= 1;
-        }
-        _reorderWidget(oldIndex, newIndex);
-      },
-      children: items,
-    );
+    return _reordering
+        ? ReorderableListView(
+            onReorder: (int oldIndex, int newIndex) {
+              if (oldIndex < newIndex) {
+                newIndex -= 1;
+              }
+              _reorderWidget(oldIndex, newIndex);
+            },
+            children: items,
+          )
+        : ListView(children: items);
   }
 
   @override
@@ -226,13 +240,26 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
-        actions: <Widget>[
-          Builder(
-              builder: (context) => IconButton(
-                    icon: Icon(Icons.add),
-                    onPressed: () => _addWidget(context),
-                  )),
-        ],
+        actions: _reordering
+            ? <Widget>[
+                Builder(
+                    builder: (context) => IconButton(
+                          icon: Icon(Icons.done),
+                          onPressed: () => _toggleReordering(context),
+                        )),
+              ]
+            : <Widget>[
+                Builder(
+                    builder: (context) => IconButton(
+                          icon: Icon(Icons.import_export),
+                          onPressed: () => _toggleReordering(context),
+                        )),
+                Builder(
+                    builder: (context) => IconButton(
+                          icon: Icon(Icons.add),
+                          onPressed: () => _addWidget(context),
+                        )),
+              ],
       ),
       backgroundColor: Color.alphaBlend(Colors.black12, Colors.white),
       body: StreamBuilder(
