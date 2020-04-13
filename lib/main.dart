@@ -82,7 +82,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _updateAsync() async {
     await _widgetDataRepository.fetch();
-    final value = await _settingsRepository.getCurrent();
+    await _settingsRepository.fetch();
+    _update();
+  }
+
+  void _update() {
+    final value = _settingsRepository.getCurrent();
     if (value == null) {
       _settingsRepository.add(default_settings);
       _settingsRepository.select(default_settings.id);
@@ -105,13 +110,13 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           FlatButton(
             child: Text('Remove'),
-            onPressed: () async {
-              final current = await _settingsRepository.getCurrent();
+            onPressed: () {
+              final current = _settingsRepository.getCurrent();
               final edited = current.removeConfigItemAt(index);
-              await _settingsRepository.update(edited);
-              await _widgetDataRepository.removeAt(index);
+              _settingsRepository.update(edited);
+              _widgetDataRepository.removeAt(index);
               Navigator.pop(context);
-              _updateAsync();
+              _update();
             },
           ),
         ],
@@ -127,41 +132,37 @@ class _MyHomePageState extends State<MyHomePage> {
     );
 
     if (result != null) {
-      final current = await _settingsRepository.getCurrent();
+      final current = _settingsRepository.getCurrent();
       final configs = current.configs.toList();
       configs[index] = result;
       final edited = current.copy(configs: configs);
-      await _settingsRepository.update(edited);
-      await _updateAsync();
+      _settingsRepository.update(edited);
+      _update();
 
       SnackBarUtil.show(context, 'You have edited a widget.');
     }
   }
 
-  void _reorderWidget(int oldIndex, int newIndex) async {
-    // update settings
-    final currentSettings = await _settingsRepository.getCurrent();
+  void _reorderWidget(int oldIndex, int newIndex) {
+    final currentSettings = _settingsRepository.getCurrent();
     final configs = currentSettings.configs.toList();
     final moved = configs.removeAt(oldIndex);
     configs.insert(newIndex, moved);
     final editedSettings = currentSettings.copy(configs: configs);
-    await _settingsRepository.update(editedSettings);
-
-    // update data
-    await _widgetDataRepository.reorder(oldIndex, newIndex);
-
-    await _updateAsync();
+    _settingsRepository.update(editedSettings);
+    _widgetDataRepository.reorder(oldIndex, newIndex);
+    _update();
   }
 
   void _addWidget(BuildContext context) async {
     final result = await Navigator.pushNamed(context, AddWidgetPage.routeName);
     if (result != null) {
-      final current = await _settingsRepository.getCurrent();
+      final current = _settingsRepository.getCurrent();
       final configs = current.configs.toList();
       configs.add(result);
       final edited = current.copy(configs: configs);
-      await _settingsRepository.update(edited);
-      await _updateAsync();
+      _settingsRepository.update(edited);
+      _update();
 
       SnackBarUtil.show(context, 'You have successfully added a widget.');
     }
@@ -173,7 +174,7 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
   }
 
-  Widget _buildList(Settings settings) {
+  Widget _buildList(BuildContext context, Settings settings) {
     final items = <Widget>[];
     settings.configs.asMap().forEach((index, config) {
       items.add(Wrap(
@@ -245,7 +246,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               );
             } else {
-              return _buildList(snapshot.data);
+              return _buildList(context, snapshot.data);
             }
           }),
     );

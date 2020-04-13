@@ -11,26 +11,38 @@ class SettingsRepository {
 
   SettingsDao _dao;
 
-  Future<Settings> getCurrent() async {
-    final all = await (await dao).getAll();
-    return all.firstWhere((element) => element.selected, orElse: () => null);
+  var _data = <Settings>[];
+
+  Settings getCurrent() {
+    return _data.firstWhere((element) => element.selected, orElse: () => null);
   }
 
-  void add(Settings settings) async {
-    await (await dao).add(settings);
+  void fetch() async {
+    _data = await (await dao).getAll();
   }
 
-  void update(Settings settings) async {
-    await (await dao).updateAll([settings]);
-  }
-
-  void select(int id) async {
+  void _writeAll() async {
     final dao = await this.dao;
-    final all = await dao.getAll();
-    final edited = all.map((it) {
-      final selected = it.id == id;
-      return it.copy(selected: selected);
+    await dao.clear();
+    await dao.addAll(_data);
+  }
+
+  void add(Settings settings) {
+    _data.add(settings);
+    _writeAll();
+  }
+
+  void update(Settings settings) {
+    final index = settings.id;
+    _data[index] = settings;
+    _writeAll();
+  }
+
+  void select(int id) {
+    _data = _data.map((element) {
+      final selected = element.id == id;
+      return element.copy(selected: selected);
     }).toList();
-    await dao.updateAll(edited);
+    _writeAll();
   }
 }

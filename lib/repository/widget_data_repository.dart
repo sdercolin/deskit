@@ -11,57 +11,56 @@ class WidgetDataRepository {
 
   WidgetDataDao _dao;
 
-  List<WidgetDataEntity> _cache = [];
+  List<WidgetDataEntity> _data = [];
 
   WidgetData get(int index) {
-    return _cache
+    return _data
         .firstWhere((element) => element.id == index, orElse: () => null)
         ?.data;
   }
 
   void fetch() async {
-    _cache = await (await dao).getAll();
+    _data = await (await dao).getAll();
   }
 
-  void addAt(WidgetData data, int index) async {
-    final newEntity = WidgetDataEntity.build(index, data);
-    await (await dao).addAll([newEntity]);
-    await fetch();
-  }
-
-  void add(WidgetData data) async {
-    final all = await (await dao).getAll();
-    final newId = all.length;
-    await addAt(data, newId);
-  }
-
-  void updateAt(WidgetData data, int index) async {
-    final updated = WidgetDataEntity.build(index, data);
-    await (await dao).updateAll([updated]);
-    await fetch();
-  }
-
-  void removeAt(int index) async {
+  void _writeAll() async {
     final dao = await this.dao;
-    final all = await dao.getAll();
-    final edited = all.toList();
+    await dao.clear();
+    await dao.addAll(_data);
+  }
+
+  void addAt(WidgetData data, int index) {
+    final newEntity = WidgetDataEntity.build(index, data);
+    _data.add(newEntity);
+    _writeAll();
+  }
+
+  void add(WidgetData data) {
+    final newId = _data.length;
+    addAt(data, newId);
+  }
+
+  void updateAt(WidgetData data, int index) {
+    final updated = WidgetDataEntity.build(index, data);
+    _data[index] = updated;
+    _writeAll();
+  }
+
+  void removeAt(int index) {
+    final edited = _data.toList();
     edited.removeAt(index);
     _rearrangeIds(edited);
-    await dao.deleteAll(all);
-    await dao.addAll(edited);
-    await fetch();
+    _data = edited;
+    _writeAll();
   }
 
   void reorder(int oldIndex, int newIndex) async {
-    final dao = await this.dao;
-    final all = await dao.getAll();
-    final edited = all.toList();
+    final edited = _data.toList();
     final reorderedItem = edited.removeAt(oldIndex);
     edited.insert(newIndex, reorderedItem);
     _rearrangeIds(edited);
-    await dao.deleteAll(all);
-    await dao.addAll(edited);
-    await fetch();
+    _data = edited;
+    _writeAll();
   }
 
   void _rearrangeIds(List<WidgetDataEntity> list) {
