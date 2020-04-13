@@ -262,7 +262,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: _reordering ? Text('Reorder widgets') : Text(widget.title),
         centerTitle: false,
         actions: _reordering
             ? <Widget>[

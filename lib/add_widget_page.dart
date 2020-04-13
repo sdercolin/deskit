@@ -11,7 +11,10 @@ class AddWidgetPage extends StatelessWidget {
     final types = WidgetTypeInfo.values;
 
     return Scaffold(
-      appBar: AppBar(title: Text('Select widget type')),
+      appBar: AppBar(
+        title: Text('Select widget type'),
+        centerTitle: false,
+      ),
       backgroundColor: Colors.white,
       body: ListView.builder(itemBuilder: (context, index) {
         if (index >= types.length) {

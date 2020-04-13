@@ -39,6 +39,7 @@ class EditWidgetPageState extends State<EditWidgetPage> {
         args.isNew ? 'Add widget: $typeName' : 'Edit widget: $typeName';
     return Scaffold(
       appBar: AppBar(
+        centerTitle: false,
         title: Text(title),
       ),
       backgroundColor: Colors.white,
