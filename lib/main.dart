@@ -72,12 +72,16 @@ class _MyHomePageState extends State<MyHomePage> {
   void _update() {
     final value = _settingsRepository.getCurrent();
     if (value == null) {
-      _settingsRepository.add(default_settings);
-      _settingsRepository.select(default_settings.id);
+      _writeDefaultSettings();
       _streamController.add(default_settings);
     } else {
       _streamController.add(value);
     }
+  }
+
+  void _writeDefaultSettings() async {
+    await _settingsRepository.add(default_settings);
+    await _settingsRepository.select(default_settings.id);
   }
 
   void _showRemoveConfirmDialog(BuildContext context, int index) {
@@ -93,11 +97,11 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           FlatButton(
             child: Text('Remove'),
-            onPressed: () {
+            onPressed: () async {
               final current = _settingsRepository.getCurrent();
               final edited = current.removeConfigItemAt(index);
-              _settingsRepository.update(edited);
-              _widgetDataRepository.removeAt(index);
+              await _settingsRepository.update(edited);
+              await _widgetDataRepository.removeAt(index);
               Navigator.pop(context);
               _update();
             },
@@ -119,7 +123,7 @@ class _MyHomePageState extends State<MyHomePage> {
       final configs = current.configs.toList();
       configs[index] = result;
       final edited = current.copy(configs: configs);
-      _settingsRepository.update(edited);
+      await _settingsRepository.update(edited);
       _update();
 
       SnackBarUtil.show(context, 'You have edited a widget.');
@@ -142,8 +146,11 @@ class _MyHomePageState extends State<MyHomePage> {
     final moved = configs.removeAt(oldIndex);
     configs.insert(newIndex, moved);
     final editedSettings = currentSettings.copy(configs: configs);
-    _settingsRepository.update(editedSettings);
-    _widgetDataRepository.reorder(oldIndex, newIndex);
+
+    // Use sync methods To shorten processing time
+    _settingsRepository.updateSync(editedSettings);
+    _widgetDataRepository.reorderSync(oldIndex, newIndex);
+
     _update();
   }
 
@@ -154,7 +161,7 @@ class _MyHomePageState extends State<MyHomePage> {
       final configs = current.configs.toList();
       configs.add(result);
       final edited = current.copy(configs: configs);
-      _settingsRepository.update(edited);
+      await _settingsRepository.update(edited);
       _update();
 
       SnackBarUtil.show(context, 'You have successfully added a widget.');

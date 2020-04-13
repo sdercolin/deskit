@@ -29,7 +29,7 @@ class _ValueKeeperState extends State<ValueKeeper> {
 
   void _setValue(int newValue) {
     _value = newValue;
-    widget.repository?.updateAt(ValueKeeperData(newValue), widget.id);
+    widget.repository?.updateAtSync(ValueKeeperData(newValue), widget.id);
   }
 
   void _increment(BuildContext context) async {
@@ -121,23 +121,26 @@ class _ValueKeeperState extends State<ValueKeeper> {
     });
   }
 
-  @override
-  void initState() {
-    _defaultValue = widget.config.initialValue;
-    _value = _defaultValue;
-    _textEditingController = TextEditingController(text: _value.toString());
-    _focus.addListener(_onFocusChange);
+  void _fetchValue() {
     final data = widget.repository?.get(widget.id);
     if (data != null) {
       if (data is ValueKeeperData) {
         _value = data.value;
         _refresh();
       } else {
-        widget.repository?.updateAt(ValueKeeperData(_value), widget.id);
+        widget.repository?.updateAtSync(ValueKeeperData(_value), widget.id);
       }
     } else {
-      widget.repository?.addAt(ValueKeeperData(_value), widget.id);
+      widget.repository?.addAtSync(ValueKeeperData(_value), widget.id);
     }
+  }
+
+  @override
+  void initState() {
+    _defaultValue = widget.config.initialValue;
+    _value = _defaultValue;
+    _textEditingController = TextEditingController(text: _value.toString());
+    _focus.addListener(_onFocusChange);
     super.initState();
   }
 
@@ -145,6 +148,7 @@ class _ValueKeeperState extends State<ValueKeeper> {
   Widget build(BuildContext context) {
     final config = widget.config;
     _defaultValue = config.initialValue;
+    _fetchValue();
 
     Widget plusButton;
     Widget minusButton;

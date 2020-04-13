@@ -21,21 +21,29 @@ class SettingsRepository {
     _data = await (await dao).getAll();
   }
 
-  void _writeAll() async {
-    final dao = await this.dao;
-    await dao.clear();
-    await dao.addAll(_data);
-  }
-
-  void add(Settings settings) {
+  void add(Settings settings) async {
     _data.add(settings);
-    _writeAll();
+    await _add(settings);
   }
 
-  void update(Settings settings) {
+  void _add(Settings settings) async {
+    await (await dao).addAll([settings]);
+  }
+
+  void update(Settings settings) async {
     final index = settings.id;
     _data[index] = settings;
-    _writeAll();
+    await _update(settings);
+  }
+
+  void updateSync(Settings settings) {
+    final index = settings.id;
+    _data[index] = settings;
+    _update(settings);
+  }
+
+  void _update(Settings settings) async {
+    await (await dao).updateAll([settings]);
   }
 
   void select(int id) {
@@ -44,5 +52,11 @@ class SettingsRepository {
       return element.copy(selected: selected);
     }).toList();
     _writeAll();
+  }
+
+  void _writeAll() async {
+    final dao = await this.dao;
+    await dao.clear();
+    await dao.addAll(_data);
   }
 }

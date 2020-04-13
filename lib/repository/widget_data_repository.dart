@@ -23,44 +23,47 @@ class WidgetDataRepository {
     _data = await (await dao).getAll();
   }
 
-  void _writeAll() async {
-    final dao = await this.dao;
-    await dao.clear();
-    await dao.addAll(_data);
-  }
-
-  void addAt(WidgetData data, int index) {
+  void addAtSync(WidgetData data, int index) {
     final newEntity = WidgetDataEntity.build(index, data);
     _data.add(newEntity);
-    _writeAll();
+    _add(newEntity);
   }
 
-  void add(WidgetData data) {
-    final newId = _data.length;
-    addAt(data, newId);
+  void _add(WidgetDataEntity entity) async {
+    await (await dao).addAll([entity]);
   }
 
-  void updateAt(WidgetData data, int index) {
+  void updateAtSync(WidgetData data, int index) {
     final updated = WidgetDataEntity.build(index, data);
     _data[index] = updated;
-    _writeAll();
+    _update(updated);
   }
 
-  void removeAt(int index) {
+  void _update(WidgetDataEntity entity) async {
+    await (await dao).updateAll([entity]);
+  }
+
+  void removeAt(int index) async {
     final edited = _data.toList();
     edited.removeAt(index);
     _rearrangeIds(edited);
     _data = edited;
-    _writeAll();
+    await _writeAll();
   }
 
-  void reorder(int oldIndex, int newIndex) async {
+  void reorderSync(int oldIndex, int newIndex) {
     final edited = _data.toList();
     final reorderedItem = edited.removeAt(oldIndex);
     edited.insert(newIndex, reorderedItem);
     _rearrangeIds(edited);
     _data = edited;
     _writeAll();
+  }
+
+  void _writeAll() async {
+    final dao = await this.dao;
+    await dao.clear();
+    await dao.addAll(_data);
   }
 
   void _rearrangeIds(List<WidgetDataEntity> list) {
