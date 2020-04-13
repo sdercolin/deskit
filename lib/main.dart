@@ -2,15 +2,14 @@ import 'dart:async';
 
 import 'package:desktop_game_helper/add_widget_page.dart';
 import 'package:desktop_game_helper/common/snack_bar_util.dart';
+import 'package:desktop_game_helper/consts/presets.dart';
 import 'package:desktop_game_helper/edit_widget_page.dart';
 import 'package:desktop_game_helper/repository/settings_repository.dart';
 import 'package:desktop_game_helper/repository/widget_data_repository.dart';
-import 'package:desktop_game_helper/value_keeper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
 import 'model/settings.dart';
-import 'model/value_keeper_config.dart';
 
 void main() {
   runApp(MyApp());
@@ -55,25 +54,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   var _reordering = false;
 
-  final default_settings = Settings.build(
-    0,
-    [
-      ValueKeeperConfig(style: ValueKeeperStyle.LARGE),
-      ValueKeeperConfig(style: ValueKeeperStyle.SMALL),
-      ValueKeeperConfig(
-          style: ValueKeeperStyle.LARGE,
-          displayInterval: true,
-          interval: 100,
-          name: 'counter 3 counter 3 counter 3 counter 3 counter 3 counter 3'),
-      ValueKeeperConfig(
-          style: ValueKeeperStyle.SMALL,
-          displayInterval: true,
-          interval: 100,
-          name: 'counter 4'),
-    ],
-    'default',
-    true,
-  );
+  final default_settings = Presets.defaultSettings;
 
   final _settingsRepository = SettingsRepository();
   final _widgetDataRepository = WidgetDataRepository();
