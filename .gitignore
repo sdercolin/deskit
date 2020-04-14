@@ -46,3 +46,4 @@ app.*.map.json
 **/*.g.dart
 key.properties
 outputs
+.last_build_id
