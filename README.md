@@ -1,3 +1,3 @@
 # Deskit
 
-Provides tools for desktop game players.
+Provides tools for tabletop game players.
