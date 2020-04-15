@@ -24,7 +24,7 @@ class AddWidgetPage extends StatelessWidget {
         return Padding(
           padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
           child: ListTile(
-            leading: Icon(Icons.exposure_plus_1),
+            leading: Icon(type.icon),
             title: Text(
               type.name,
               style: TextStyle(fontSize: 16),

@@ -1,18 +1,16 @@
 import 'package:deskit/common/snack_bar_util.dart';
 import 'package:deskit/common/text_edit_alert_dialog.dart';
 import 'package:deskit/deskit_widget.dart';
-import 'package:deskit/repository/widget_data_repository.dart';
 import 'package:flutter/material.dart';
 
 import 'model/value_keeper_config.dart';
 import 'model/value_keeper_data.dart';
 
 class ValueKeeper extends DeskitWidget<ValueKeeper> {
-  ValueKeeper(this.config, this.repository, this.id, key) : super(key);
+  ValueKeeper(this.config, id, repository, key) : super(config, id, repository, key);
 
+  @override
   final ValueKeeperConfig config;
-  final WidgetDataRepository repository;
-  final int id;
 
   @override
   _ValueKeeperState createState() {

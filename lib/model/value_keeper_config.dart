@@ -13,7 +13,7 @@ import 'config.dart';
 part 'value_keeper_config.g.dart';
 
 @JsonSerializable(nullable: false)
-class ValueKeeperConfig extends Config {
+class ValueKeeperConfig extends Config<ValueKeeper> {
   static const TYPE = 'ValueKeeper';
 
   @override
@@ -39,8 +39,8 @@ class ValueKeeperConfig extends Config {
   }) : super(TYPE);
 
   @override
-  DeskitWidget build(WidgetDataRepository repository, int id, GlobalKey key) {
-    return ValueKeeper(this, repository, id, key);
+  ValueKeeper build(int id, WidgetDataRepository repository, GlobalKey key) {
+    return ValueKeeper(this, id, repository, key);
   }
 
   @override

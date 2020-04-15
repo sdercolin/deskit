@@ -217,7 +217,7 @@ class _MyHomePageState extends State<MyHomePage> {
     settings.configs.asMap().forEach((index, config) {
       final key = GlobalKey<DeskitWidgetState>();
       _myWidgetStateKeys.add(key);
-      final widget = config.build(_widgetDataRepository, index, key);
+      final widget = config.build(index, _widgetDataRepository, key);
       widgetWrappers.add(Wrap(
         key: Key(index.toString()),
         children: [

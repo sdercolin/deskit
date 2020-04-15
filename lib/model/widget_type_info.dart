@@ -1,8 +1,11 @@
 import 'package:deskit/model/config.dart';
 import 'package:deskit/model/value_keeper_config.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 enum WidgetTypeInfo {
   VALUE_KEEPER,
+  COIN,
 }
 
 extension WidgetTypeInfoExtension on WidgetTypeInfo {
@@ -10,6 +13,8 @@ extension WidgetTypeInfoExtension on WidgetTypeInfo {
     switch (this) {
       case WidgetTypeInfo.VALUE_KEEPER:
         return 'Counter';
+      case WidgetTypeInfo.COIN:
+        return 'Coin toss';
       default:
         return null;
     }
@@ -19,6 +24,20 @@ extension WidgetTypeInfoExtension on WidgetTypeInfo {
     switch (this) {
       case WidgetTypeInfo.VALUE_KEEPER:
         return 'Retain a value that can be incremented or decremented by a customized interval';
+      case WidgetTypeInfo.COIN:
+        return 'Randomly generate a result of coin toss';
+      default:
+        return null;
+    }
+  }
+
+  IconData get icon{
+
+    switch (this) {
+      case WidgetTypeInfo.VALUE_KEEPER:
+        return Icons.exposure_plus_1;
+      case WidgetTypeInfo.COIN:
+        return Icons.remove_circle_outline;
       default:
         return null;
     }
