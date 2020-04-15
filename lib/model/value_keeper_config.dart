@@ -1,6 +1,7 @@
 import 'dart:convert';
 
-import 'package:deskit/deskit_widget.dart';
+import 'package:deskit/model/value_keeper_data.dart';
+import 'package:deskit/model/widget_data.dart';
 import 'package:deskit/model/widget_type_info.dart';
 import 'package:deskit/repository/widget_data_repository.dart';
 import 'package:flutter/cupertino.dart';
@@ -47,6 +48,11 @@ class ValueKeeperConfig extends Config<ValueKeeper> {
   ConfigEditList buildEditList(EditWidgetPageState parentState) =>
       ValueKeeperConfigEditList(this, parentState);
 
+  @override
+  WidgetData getDefaultData() {
+    return ValueKeeperData(initialValue);
+  }
+
   factory ValueKeeperConfig.fromJson(String json) {
     final item = _$ValueKeeperConfigFromJson(jsonDecode(json));
     item.style ??= ValueKeeperStyle.LARGE;
@@ -59,7 +65,7 @@ class ValueKeeperConfig extends Config<ValueKeeper> {
   }
 
   @override
-  String toJson() => jsonEncode(_$ValueKeeperConfigToJson(this));
+  String toString() => jsonEncode(_$ValueKeeperConfigToJson(this));
 
   static int validateValue(int value) {
     if (value > maxAbsoluteValue) {

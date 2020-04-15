@@ -1,4 +1,5 @@
 import 'package:deskit/common/snack_bar_util.dart';
+import 'package:deskit/model/coin_config.dart';
 import 'package:deskit/model/config.dart';
 import 'package:deskit/model/value_keeper_config.dart';
 import 'package:deskit/value_keeper.dart';
@@ -77,6 +78,9 @@ abstract class ConfigEditList<T extends Config> extends StatelessWidget {
 
   ConfigEditList(this.originalConfig, this.parentState);
 
+  final itemPadding = EdgeInsets.symmetric(horizontal: 20);
+  final itemConstraints = BoxConstraints(minHeight: 60);
+
   List<Widget> buildList(BuildContext context, T config);
 
   @override
@@ -123,9 +127,6 @@ class ValueKeeperConfigEditList extends ConfigEditList<ValueKeeperConfig> {
 
   @override
   List<Widget> buildList(BuildContext context, ValueKeeperConfig config) {
-    final itemPadding = EdgeInsets.symmetric(horizontal: 20);
-    final itemConstraints = BoxConstraints(minHeight: 60);
-
     return [
       Container(
         constraints: itemConstraints,
@@ -220,8 +221,8 @@ class ValueKeeperConfigEditList extends ConfigEditList<ValueKeeperConfig> {
           ),
         ),
         onTap: () async {
-          final result = await TextFieldAlertDialog.show(context,
-              'Edit initial value', config.initialValue.toString() ?? '',
+          final result = await TextFieldAlertDialog.show(
+              context, 'Edit initial value', config.initialValue.toString(),
               inputType: TextInputType.number);
           if (result != null) {
             final intResult = int.tryParse(result);
@@ -262,7 +263,7 @@ class ValueKeeperConfigEditList extends ConfigEditList<ValueKeeperConfig> {
               ),
               onTap: () async {
                 final result = await TextFieldAlertDialog.show(
-                    context, 'Edit interval', config.interval.toString() ?? '',
+                    context, 'Edit interval', config.interval.toString(),
                     inputType: TextInputType.number);
                 if (result != null) {
                   final intResult = int.tryParse(result);
@@ -340,5 +341,95 @@ class ValueKeeperConfigEditList extends ConfigEditList<ValueKeeperConfig> {
       ),
       SizedBox(height: 10),
     ].where((element) => element != null).toList();
+  }
+}
+
+class CoinConfigEditList extends ConfigEditList<CoinConfig> {
+  CoinConfigEditList(CoinConfig originalConfig, EditWidgetPageState parentState)
+      : super(originalConfig, parentState);
+
+  @override
+  List<Widget> buildList(BuildContext context, CoinConfig config) {
+    return [
+      InkWell(
+        child: Container(
+          constraints: itemConstraints,
+          padding: itemPadding,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Container(
+                child: Text(
+                  'Number of coins by single toss',
+                  textAlign: TextAlign.left,
+                  style: Style.PreferenceTitle,
+                ),
+              ),
+              Container(
+                child: Text(config.number.toString()),
+              ),
+            ],
+          ),
+        ),
+        onTap: () async {
+          final result = await TextFieldAlertDialog.show(
+              context, 'Edit number of coins', config.number.toString(),
+              inputType: TextInputType.number);
+          if (result != null) {
+            final intResult = int.tryParse(result);
+            final min = 1;
+            final max = CoinConfig.maxNumber;
+            if (intResult != null && intResult >= min && intResult <= max) {
+              parentState.update(() {
+                config.number = intResult;
+              });
+            } else {
+              SnackBarUtil.show(context,
+                  'Number of coins should be an integer between $min and $max.');
+            }
+          }
+        },
+      ),
+      InkWell(
+        child: Container(
+          constraints: itemConstraints,
+          padding: itemPadding,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Container(
+                child: Text(
+                  'Display name',
+                  textAlign: TextAlign.left,
+                  style: Style.PreferenceTitle,
+                ),
+              ),
+              Container(
+                constraints: BoxConstraints(maxWidth: 200),
+                child: config.name.isNotEmpty
+                    ? Text(
+                        config.name,
+                        overflow: TextOverflow.ellipsis,
+                        softWrap: false,
+                      )
+                    : Text(
+                        'Undefined',
+                        style: TextStyle(fontStyle: FontStyle.italic),
+                      ),
+              ),
+            ],
+          ),
+        ),
+        onTap: () async {
+          final result = await TextFieldAlertDialog.show(
+              context, 'Edit display name', config.name);
+          if (result != null) {
+            parentState.update(() {
+              config.name = result;
+            });
+          }
+        },
+      ),
+    ];
   }
 }

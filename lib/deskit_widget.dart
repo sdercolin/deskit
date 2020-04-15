@@ -1,5 +1,7 @@
+import 'package:deskit/model/widget_data.dart';
 import 'package:deskit/repository/widget_data_repository.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 import 'model/config.dart';
 
@@ -12,6 +14,79 @@ abstract class DeskitWidget<T> extends StatefulWidget {
   final int id;
 }
 
-abstract class DeskitWidgetState<T extends StatefulWidget> extends State<T> {
-  void reset();
+abstract class DeskitWidgetState<T extends DeskitWidget<T>> extends State<T> {
+  WidgetData<T> defaultData;
+  WidgetData<T> data;
+
+  bool verifyData(WidgetData data);
+
+  void updateData(WidgetData<T> newData) {
+    data = newData;
+    widget.repository?.updateAtSync(data, widget.id);
+  }
+
+  void preBuild() {
+    defaultData = widget.config.getDefaultData();
+    final newData = widget.repository?.get(widget.id);
+    if (newData != null) {
+      if (verifyData((newData))) {
+        updateData(newData);
+        setupUI();
+      } else {
+        widget.repository?.updateAtSync(data, widget.id);
+      }
+    } else {
+      widget.repository?.addAtSync(data, widget.id);
+    }
+  }
+
+  void setupUI();
+
+  void reset() {
+    setState(() {
+      updateData(defaultData);
+      setupUI();
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    defaultData = widget.config.getDefaultData();
+    data = defaultData;
+  }
+
+  Widget wrapWithNameTag(Widget body, String name) {
+    if (name.isNotEmpty) {
+      return Container(
+        color: Colors.white,
+        child: Stack(
+          children: <Widget>[
+            Container(
+              color: Color.alphaBlend(Colors.white30, Colors.amberAccent),
+              child: Padding(
+                padding:
+                    EdgeInsets.only(top: 5, left: 10, right: 10, bottom: 5),
+                child: Container(
+                  constraints: BoxConstraints(maxWidth: 100),
+                  child: Text(
+                    name,
+                    overflow: TextOverflow.fade,
+                    softWrap: false,
+                    style: TextStyle(fontSize: 10),
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(top: 5),
+              child: body,
+            ),
+          ],
+        ),
+      );
+    } else {
+      return Container(color: Colors.white, child: body);
+    }
+  }
 }

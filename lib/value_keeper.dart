@@ -1,13 +1,15 @@
 import 'package:deskit/common/snack_bar_util.dart';
 import 'package:deskit/common/text_edit_alert_dialog.dart';
 import 'package:deskit/deskit_widget.dart';
+import 'package:deskit/model/widget_data.dart';
 import 'package:flutter/material.dart';
 
 import 'model/value_keeper_config.dart';
 import 'model/value_keeper_data.dart';
 
 class ValueKeeper extends DeskitWidget<ValueKeeper> {
-  ValueKeeper(this.config, id, repository, key) : super(config, id, repository, key);
+  ValueKeeper(this.config, id, repository, key)
+      : super(config, id, repository, key);
 
   @override
   final ValueKeeperConfig config;
@@ -19,17 +21,19 @@ class ValueKeeper extends DeskitWidget<ValueKeeper> {
 }
 
 class _ValueKeeperState extends DeskitWidgetState<ValueKeeper> {
-  var _defaultValue;
-  var _value;
+  int get _value => (data as ValueKeeperData).value;
+
+  set _value(int newValue) {
+    updateData(ValueKeeperData(newValue));
+  }
+
+  @override
+  bool verifyData(WidgetData data) => data is ValueKeeperData;
+
   final _focus = FocusNode();
   var _isFocus = false;
 
   TextEditingController _textEditingController;
-
-  void _setValue(int newValue) {
-    _value = newValue;
-    widget.repository?.updateAtSync(ValueKeeperData(newValue), widget.id);
-  }
 
   void _increment(BuildContext context) async {
     int interval;
@@ -44,9 +48,8 @@ class _ValueKeeperState extends DeskitWidgetState<ValueKeeper> {
     var newValue = _value + interval;
     newValue = ValueKeeperConfig.validateValue(newValue);
     setState(() {
-      _setValue(newValue);
-      _refresh();
-      _focus.unfocus();
+      _value = newValue;
+      setupUI();
     });
   }
 
@@ -63,9 +66,8 @@ class _ValueKeeperState extends DeskitWidgetState<ValueKeeper> {
     var newValue = _value - interval;
     newValue = ValueKeeperConfig.validateValue(newValue);
     setState(() {
-      _setValue(newValue);
-      _refresh();
-      _focus.unfocus();
+      _value = newValue;
+      setupUI();
     });
   }
 
@@ -92,16 +94,9 @@ class _ValueKeeperState extends DeskitWidgetState<ValueKeeper> {
   }
 
   @override
-  void reset() {
-    setState(() {
-      _setValue(_defaultValue);
-      _refresh();
-      _focus.unfocus();
-    });
-  }
-
-  void _refresh() {
+  void setupUI() {
     _textEditingController.text = _value.toString();
+    _focus.unfocus();
   }
 
   void _onFocusChange() {
@@ -109,46 +104,30 @@ class _ValueKeeperState extends DeskitWidgetState<ValueKeeper> {
       _isFocus = _focus.hasFocus;
       if (!_isFocus) {
         if (_textEditingController.text.isEmpty) {
-          _setValue(_defaultValue);
+          _value = (defaultData as ValueKeeperData).value;
         } else {
           var parsedValue = int.tryParse(_textEditingController.text);
           if (parsedValue != null) {
-            _setValue(ValueKeeperConfig.validateValue(parsedValue));
+            _value = ValueKeeperConfig.validateValue(parsedValue);
           }
         }
-        _refresh();
+        setupUI();
       }
     });
   }
 
-  void _fetchValue() {
-    final data = widget.repository?.get(widget.id);
-    if (data != null) {
-      if (data is ValueKeeperData) {
-        _value = data.value;
-        _refresh();
-      } else {
-        widget.repository?.updateAtSync(ValueKeeperData(_value), widget.id);
-      }
-    } else {
-      widget.repository?.addAtSync(ValueKeeperData(_value), widget.id);
-    }
-  }
-
   @override
   void initState() {
-    _defaultValue = widget.config.initialValue;
-    _value = _defaultValue;
+    super.initState();
     _textEditingController = TextEditingController(text: _value.toString());
     _focus.addListener(_onFocusChange);
-    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    preBuild();
+
     final config = widget.config;
-    _defaultValue = config.initialValue;
-    _fetchValue();
 
     Widget plusButton;
     Widget minusButton;
@@ -201,7 +180,8 @@ class _ValueKeeperState extends DeskitWidgetState<ValueKeeper> {
       controller: _textEditingController,
       focusNode: _focus,
       decoration: InputDecoration(
-          border: OutlineInputBorder(), hintText: _defaultValue.toString()),
+          border: OutlineInputBorder(),
+          hintText: (defaultData as ValueKeeperData).value.toString()),
     );
 
     Widget body;
@@ -258,37 +238,7 @@ class _ValueKeeperState extends DeskitWidgetState<ValueKeeper> {
         break;
     }
 
-    if (config.name.isNotEmpty) {
-      return Container(
-        color: Colors.white,
-        child: Stack(
-          children: <Widget>[
-            Container(
-              color: Color.alphaBlend(Colors.white30, Colors.amberAccent),
-              child: Padding(
-                padding:
-                    EdgeInsets.only(top: 5, left: 10, right: 10, bottom: 5),
-                child: Container(
-                  constraints: BoxConstraints(maxWidth: 100),
-                  child: Text(
-                    config.name,
-                    overflow: TextOverflow.fade,
-                    softWrap: false,
-                    style: TextStyle(fontSize: 10),
-                  ),
-                ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.only(top: 5),
-              child: body,
-            ),
-          ],
-        ),
-      );
-    } else {
-      return Container(color: Colors.white, child: body);
-    }
+    return wrapWithNameTag(body, config.name);
   }
 
   @override

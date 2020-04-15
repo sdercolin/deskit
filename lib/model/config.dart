@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:deskit/deskit_widget.dart';
 import 'package:deskit/model/coin_config.dart';
 import 'package:deskit/model/value_keeper_config.dart';
+import 'package:deskit/model/widget_data.dart';
 import 'package:deskit/model/widget_type_info.dart';
 import 'package:deskit/repository/widget_data_repository.dart';
 import 'package:flutter/cupertino.dart';
@@ -19,21 +20,24 @@ abstract class Config<T extends DeskitWidget> {
 
   ConfigEditList buildEditList(EditWidgetPageState parentState);
 
-  String toJson();
+  WidgetData getDefaultData();
 
-  static Config fromJson(String json) {
-    var map = jsonDecode(json);
-    switch (map['type']) {
+  @override
+  String toString();
+
+  static Config fromString(String jsonString) {
+    var json = jsonDecode(jsonString);
+    switch (json['type']) {
       case ValueKeeperConfig.TYPE:
-        return ValueKeeperConfig.fromJson(json);
+        return ValueKeeperConfig.fromJson(jsonString);
       case CoinConfig.TYPE:
-        return CoinConfig.fromJson(json);
+        return CoinConfig.fromJson(jsonString);
       default:
         return null;
     }
   }
 
   Config copy() {
-    return Config.fromJson(toJson());
+    return Config.fromString(toString());
   }
 }

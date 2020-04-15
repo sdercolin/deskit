@@ -1,7 +1,8 @@
 import 'dart:convert';
 
 import 'package:deskit/coin.dart';
-import 'package:deskit/deskit_widget.dart';
+import 'package:deskit/model/coin_data.dart';
+import 'package:deskit/model/widget_data.dart';
 import 'package:deskit/model/widget_type_info.dart';
 import 'package:deskit/repository/widget_data_repository.dart';
 import 'package:flutter/cupertino.dart';
@@ -19,7 +20,7 @@ class CoinConfig extends Config<Coin> {
   @override
   final typeInfo = WidgetTypeInfo.COIN;
 
-  static const maxNumber = 5;
+  static const maxNumber = 10;
 
   int number;
   String name;
@@ -33,8 +34,12 @@ class CoinConfig extends Config<Coin> {
 
   @override
   ConfigEditList buildEditList(EditWidgetPageState parentState) {
-    // TODO: implement buildEditList
-    throw UnimplementedError();
+    return CoinConfigEditList(this, parentState);
+  }
+
+  @override
+  WidgetData getDefaultData() {
+    return CoinData([]);
   }
 
   factory CoinConfig.fromJson(String json) {
@@ -45,5 +50,5 @@ class CoinConfig extends Config<Coin> {
   }
 
   @override
-  String toJson() => jsonEncode(_$CoinConfigToJson(this));
+  String toString() => jsonEncode(_$CoinConfigToJson(this));
 }

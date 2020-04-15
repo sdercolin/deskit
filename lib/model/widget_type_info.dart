@@ -1,3 +1,4 @@
+import 'package:deskit/model/coin_config.dart';
 import 'package:deskit/model/config.dart';
 import 'package:deskit/model/value_keeper_config.dart';
 import 'package:flutter/cupertino.dart';
@@ -47,6 +48,8 @@ extension WidgetTypeInfoExtension on WidgetTypeInfo {
     switch (this) {
       case WidgetTypeInfo.VALUE_KEEPER:
         return ValueKeeperConfig();
+      case WidgetTypeInfo.COIN:
+        return CoinConfig();
       default:
         return null;
     }
