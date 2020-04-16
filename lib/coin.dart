@@ -95,8 +95,5 @@ class _CoinState extends DeskitWidgetState<Coin> {
   }
 
   @override
-  bool verifyData(WidgetData data) => data is CoinData;
-
-  @override
   void setupUI() {}
 }

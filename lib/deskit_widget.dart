@@ -18,7 +18,9 @@ abstract class DeskitWidgetState<T extends DeskitWidget<T>> extends State<T> {
   WidgetData<T> defaultData;
   WidgetData<T> data;
 
-  bool verifyData(WidgetData data);
+  bool verifyData(WidgetData data) {
+    return data is WidgetData<T>;
+  }
 
   void updateData(WidgetData<T> newData) {
     data = newData;

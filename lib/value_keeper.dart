@@ -27,9 +27,6 @@ class _ValueKeeperState extends DeskitWidgetState<ValueKeeper> {
     updateData(ValueKeeperData(newValue));
   }
 
-  @override
-  bool verifyData(WidgetData data) => data is ValueKeeperData;
-
   final _focus = FocusNode();
   var _isFocus = false;
 
