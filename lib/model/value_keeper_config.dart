@@ -5,6 +5,7 @@ import 'package:deskit/model/widget_data.dart';
 import 'package:deskit/model/widget_type_info.dart';
 import 'package:deskit/repository/widget_data_repository.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 import '../edit_widget_page.dart';
@@ -40,8 +41,9 @@ class ValueKeeperConfig extends Config<ValueKeeper> {
   }) : super(TYPE);
 
   @override
-  ValueKeeper build(int id, WidgetDataRepository repository, GlobalKey key) {
-    return ValueKeeper(this, id, repository, key);
+  ValueKeeper build(int id, WidgetDataRepository repository, GlobalKey key,
+      GlobalKey<ScaffoldState> scaffoldKey) {
+    return ValueKeeper(this, id, repository, key, scaffoldKey);
   }
 
   @override

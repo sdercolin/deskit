@@ -57,6 +57,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  final key = GlobalKey<ScaffoldState>();
+
   var _reordering = false;
 
   final default_settings = Presets.defaultSettings;
@@ -220,9 +222,9 @@ class _MyHomePageState extends State<MyHomePage> {
     _myWidgetStateKeys.clear();
     final widgetWrappers = <Widget>[];
     settings.configs.asMap().forEach((index, config) {
-      final key = GlobalKey<DeskitWidgetState>();
-      _myWidgetStateKeys.add(key);
-      final widget = config.build(index, _widgetDataRepository, key);
+      final widgetKey = GlobalKey<DeskitWidgetState>();
+      _myWidgetStateKeys.add(widgetKey);
+      final widget = config.build(index, _widgetDataRepository, widgetKey, key);
       widgetWrappers.add(Wrap(
         key: Key(index.toString()),
         children: [
@@ -280,6 +282,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: key,
       appBar: AppBar(
         title: _reordering ? Text('Reorder widgets') : Text(widget.title),
         centerTitle: false,

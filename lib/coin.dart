@@ -12,7 +12,8 @@ import 'deskit_widget.dart';
 import 'model/coin_data.dart';
 
 class Coin extends DeskitWidget<Coin> {
-  Coin(this.config, id, repository, key) : super(config, id, repository, key);
+  Coin(this.config, id, repository, key, scaffoldKey)
+      : super(config, id, repository, key, scaffoldKey);
 
   @override
   final CoinConfig config;
@@ -63,7 +64,7 @@ class _CoinState extends DeskitWidgetState<Coin> {
             );
 
       await CustomAlertDialog.show(
-          context,
+          widget.scaffoldKey.currentContext,
           Container(
             padding: EdgeInsets.symmetric(vertical: 30),
             child: Wrap(

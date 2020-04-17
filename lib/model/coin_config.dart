@@ -6,6 +6,7 @@ import 'package:deskit/model/widget_data.dart';
 import 'package:deskit/model/widget_type_info.dart';
 import 'package:deskit/repository/widget_data_repository.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 import '../edit_widget_page.dart';
@@ -35,8 +36,9 @@ class CoinConfig extends Config<Coin> {
   }) : super(TYPE);
 
   @override
-  Coin build(int id, WidgetDataRepository repository, GlobalKey key) {
-    return Coin(this, id, repository, key);
+  Coin build(int id, WidgetDataRepository repository, GlobalKey key,
+      GlobalKey<ScaffoldState> scaffoldKey) {
+    return Coin(this, id, repository, key, scaffoldKey);
   }
 
   @override

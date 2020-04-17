@@ -6,12 +6,13 @@ import 'package:flutter/material.dart';
 import 'model/config.dart';
 
 abstract class DeskitWidget<T> extends StatefulWidget {
-  DeskitWidget(this.config, this.id, this.repository, Key key)
+  DeskitWidget(this.config, this.id, this.repository, Key key, this.scaffoldKey)
       : super(key: key);
 
   final Config config;
   final WidgetDataRepository repository;
   final int id;
+  final GlobalKey<ScaffoldState> scaffoldKey;
 }
 
 abstract class DeskitWidgetState<T extends DeskitWidget<T>> extends State<T> {

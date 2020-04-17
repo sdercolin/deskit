@@ -7,8 +7,8 @@ import 'model/value_keeper_config.dart';
 import 'model/value_keeper_data.dart';
 
 class ValueKeeper extends DeskitWidget<ValueKeeper> {
-  ValueKeeper(this.config, id, repository, key)
-      : super(config, id, repository, key);
+  ValueKeeper(this.config, id, repository, key, scaffoldKey)
+      : super(config, id, repository, key, scaffoldKey);
 
   @override
   final ValueKeeperConfig config;

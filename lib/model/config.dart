@@ -7,6 +7,7 @@ import 'package:deskit/model/widget_data.dart';
 import 'package:deskit/model/widget_type_info.dart';
 import 'package:deskit/repository/widget_data_repository.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 import '../edit_widget_page.dart';
 
@@ -16,7 +17,8 @@ abstract class Config<T extends DeskitWidget> {
 
   Config(this.type);
 
-  T build(int id, WidgetDataRepository repository, GlobalKey key);
+  T build(int id, WidgetDataRepository repository, GlobalKey key,
+      GlobalKey<ScaffoldState> scaffoldKey);
 
   ConfigEditList buildEditList(EditWidgetPageState parentState);
 

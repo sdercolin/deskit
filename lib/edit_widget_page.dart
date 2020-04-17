@@ -18,6 +18,8 @@ class EditWidgetPage extends StatefulWidget {
 }
 
 class EditWidgetPageState extends State<EditWidgetPage> {
+  final key = GlobalKey<ScaffoldState>();
+
   Config currentConfig;
 
   void update(Function() updateFunction) {
@@ -33,12 +35,13 @@ class EditWidgetPageState extends State<EditWidgetPage> {
 
     currentConfig ??= args.originalConfig.copy();
 
-    final preview = currentConfig.build(null, null, null);
+    final preview = currentConfig.build(null, null, null, key);
     final list = currentConfig.buildEditList(this);
     final typeName = currentConfig.typeInfo.name;
     final title =
         args.isNew ? 'Add widget: $typeName' : 'Edit widget: $typeName';
     return Scaffold(
+      key: key,
       appBar: AppBar(
         centerTitle: false,
         title: Text(title),
