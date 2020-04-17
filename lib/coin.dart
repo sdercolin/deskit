@@ -120,7 +120,7 @@ class _CoinState extends DeskitWidgetState<Coin> {
     Widget body;
     if (config.showHistory) {
       body = Container(
-        padding: EdgeInsets.symmetric(horizontal: 35, vertical: 15),
+        padding: EdgeInsets.only(left: 35, right: 35, top: 15, bottom: 20),
         constraints: BoxConstraints(maxHeight: 130),
         child: Row(
           children: [
@@ -157,7 +157,7 @@ class _CoinState extends DeskitWidgetState<Coin> {
       );
     } else {
       body = Container(
-        padding: EdgeInsets.symmetric(horizontal: 35, vertical: 10),
+        padding: EdgeInsets.only(left: 35, right: 35, top: 10, bottom: 15),
         constraints: BoxConstraints(maxHeight: 70),
         child: Row(
           children: [
