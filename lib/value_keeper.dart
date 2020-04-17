@@ -1,7 +1,6 @@
 import 'package:deskit/common/snack_bar_util.dart';
 import 'package:deskit/common/text_edit_alert_dialog.dart';
 import 'package:deskit/deskit_widget.dart';
-import 'package:deskit/model/widget_data.dart';
 import 'package:flutter/material.dart';
 
 import 'model/value_keeper_config.dart';

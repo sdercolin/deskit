@@ -43,4 +43,10 @@ class CoinTossResult {
     final timeText = formatter.format(dateTime);
     return '$timeText Obverse: $obverse/$total';
   }
+
+  String buildSimpleText() {
+    return total > 1
+        ? 'Obverse: $obverse/$total'
+        : (obverse == 1 ? 'Obverse' : 'Reverse');
+  }
 }

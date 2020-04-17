@@ -430,6 +430,33 @@ class CoinConfigEditList extends ConfigEditList<CoinConfig> {
           }
         },
       ),
+      Container(
+        constraints: itemConstraints,
+        padding: itemPadding,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Container(
+              child: Text(
+                'Show history',
+                textAlign: TextAlign.left,
+                style: Style.PreferenceTitle,
+              ),
+            ),
+            Container(
+              child: Switch(
+                value: config.showHistory,
+                onChanged: (value) {
+                  parentState.update(() {
+                    config.showHistory = value;
+                  });
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+      SizedBox(height: 10),
     ];
   }
 }

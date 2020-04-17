@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:deskit/model/coin_config.dart';
-import 'package:deskit/model/widget_data.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -48,49 +47,87 @@ class _CoinState extends DeskitWidgetState<Coin> {
     preBuild();
     final config = widget.config;
     final number = config.number;
-    final body = Container(
-      padding: EdgeInsets.symmetric(horizontal: 35, vertical: 15),
-      constraints: BoxConstraints(maxHeight: 130),
-      child: Row(
-        children: [
-          Expanded(
-            child: Container(
-              color: Color.fromARGB(5, 0, 0, 0),
-              padding: EdgeInsets.all(10),
-              child: _results.isEmpty
-                  ? Center(child: Text('No history'))
-                  : ListView(
-                      children: _results
-                          .map((result) => Padding(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 5, vertical: 3),
-                                child: Text(
-                                  result.buildText(),
-                                  style: TextStyle(fontSize: 10),
-                                ),
-                              ))
-                          .toList()
-                          .reversed
-                          .toList(),
-                    ),
-            ),
-          ),
-          SizedBox(width: 20),
-          Container(
-            height: double.infinity,
-            width: 120,
-            child: RaisedButton(
-              color: Colors.amber,
-              child: Text(
-                number > 1 ? 'Coin × ${number}' : 'Coin',
-                style: TextStyle(fontSize: 20),
+    Widget body;
+    if (config.showHistory) {
+      body = Container(
+        padding: EdgeInsets.symmetric(horizontal: 35, vertical: 15),
+        constraints: BoxConstraints(maxHeight: 130),
+        child: Row(
+          children: [
+            Expanded(
+              child: Container(
+                color: Color.fromARGB(5, 0, 0, 0),
+                padding: EdgeInsets.all(10),
+                child: _results.isEmpty
+                    ? Center(child: Text('No history'))
+                    : ListView(
+                        children: _results
+                            .map((result) => Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 5, vertical: 3),
+                                  child: Text(
+                                    result.buildText(),
+                                    style: TextStyle(fontSize: 10),
+                                  ),
+                                ))
+                            .toList()
+                            .reversed
+                            .toList(),
+                      ),
               ),
-              onPressed: _toss,
             ),
-          ),
-        ],
-      ),
-    );
+            SizedBox(width: 20),
+            Container(
+              height: double.infinity,
+              width: 120,
+              child: RaisedButton(
+                color: Colors.amber,
+                child: Text(
+                  number > 1 ? 'Coin × ${number}' : 'Coin',
+                  style: TextStyle(fontSize: 20),
+                ),
+                onPressed: _toss,
+              ),
+            ),
+          ],
+        ),
+      );
+    } else {
+      body = Container(
+        padding: EdgeInsets.symmetric(horizontal: 35, vertical: 10),
+        constraints: BoxConstraints(maxHeight: 70),
+        child: Row(
+          children: [
+            Expanded(
+              child: Container(
+                alignment: Alignment.center,
+                color: Color.fromARGB(5, 0, 0, 0),
+                padding: EdgeInsets.all(10),
+                child: Text(
+                  _results.isEmpty
+                      ? 'No result'
+                      : _results.last.buildSimpleText(),
+                  style: TextStyle(fontSize: 16),
+                ),
+              ),
+            ),
+            SizedBox(width: 20),
+            Container(
+              height: double.infinity,
+              width: 60,
+              child: RaisedButton(
+                color: Colors.amber,
+                child: Text(
+                  number > 1 ? 'Coin × ${number}' : 'Coin',
+                  style: TextStyle(fontSize: 12),
+                ),
+                onPressed: _toss,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
     return wrapWithNameTag(body, config.name);
   }
 

@@ -24,8 +24,10 @@ class CoinConfig extends Config<Coin> {
 
   int number;
   String name;
+  bool showHistory;
 
-  CoinConfig({this.number = 1, this.name = ''}) : super(TYPE);
+  CoinConfig({this.number = 1, this.name = '', this.showHistory = true})
+      : super(TYPE);
 
   @override
   Coin build(int id, WidgetDataRepository repository, GlobalKey key) {
@@ -46,6 +48,7 @@ class CoinConfig extends Config<Coin> {
     final item = _$CoinConfigFromJson(jsonDecode(json));
     item.number ??= 1;
     item.name ??= '';
+    item.showHistory ??= true;
     return item;
   }
 
