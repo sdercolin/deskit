@@ -47,6 +47,18 @@ class _CoinState extends DeskitWidgetState<Coin> {
     preBuild();
     final config = widget.config;
     final number = config.number;
+
+    final fontSize = config.showHistory ? 20.0 : 12.0;
+    final button = RaisedButton(
+      color: Colors.amber,
+      child: Text(
+        number > 1 ? 'Coin × ${number}' : 'Coin',
+        style: TextStyle(fontSize: fontSize),
+        textAlign: TextAlign.center,
+      ),
+      onPressed: _toss,
+    );
+
     Widget body;
     if (config.showHistory) {
       body = Container(
@@ -80,14 +92,7 @@ class _CoinState extends DeskitWidgetState<Coin> {
             Container(
               height: double.infinity,
               width: 120,
-              child: RaisedButton(
-                color: Colors.amber,
-                child: Text(
-                  number > 1 ? 'Coin × ${number}' : 'Coin',
-                  style: TextStyle(fontSize: 20),
-                ),
-                onPressed: _toss,
-              ),
+              child: button,
             ),
           ],
         ),
@@ -115,14 +120,7 @@ class _CoinState extends DeskitWidgetState<Coin> {
             Container(
               height: double.infinity,
               width: 60,
-              child: RaisedButton(
-                color: Colors.amber,
-                child: Text(
-                  number > 1 ? 'Coin × ${number}' : 'Coin',
-                  style: TextStyle(fontSize: 12),
-                ),
-                onPressed: _toss,
-              ),
+              child: button,
             ),
           ],
         ),
