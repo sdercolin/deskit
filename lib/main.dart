@@ -146,6 +146,11 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  void _resetWidget(BuildContext context, int index) async {
+    _myWidgetStateKeys[index].currentState.reset();
+    FocusUtil.unfocusAll(context);
+  }
+
   void _editWidget(BuildContext context, Settings settings, int index) async {
     FocusUtil.unfocusAll(context);
     final result = await Navigator.pushNamed(
@@ -245,6 +250,14 @@ class _MyHomePageState extends State<MyHomePage> {
                 color: Colors.amber,
                 icon: Icons.settings,
                 onTap: () => _editWidget(context, settings, index),
+              ),
+            ],
+            secondaryActions: [
+              IconSlideAction(
+                caption: 'Reset',
+                color: Color.alphaBlend(Colors.white70, Colors.amber),
+                icon: Icons.refresh,
+                onTap: () => _resetWidget(context, index),
               ),
             ],
           )

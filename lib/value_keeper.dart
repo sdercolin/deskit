@@ -162,13 +162,6 @@ class _ValueKeeperState extends DeskitWidgetState<ValueKeeper> {
       );
     }
 
-    final resetButton = InkWell(
-      child: Icon(Icons.refresh, size: config.style.resetButtonSize),
-      onTap: () => SnackBarUtil.show(
-          context, 'Long press this button to reset the widget.'),
-      onLongPress: reset,
-    );
-
     final textField = TextField(
       style: config.style.getTextFieldStyle(context),
       textAlign: TextAlign.center,
@@ -186,46 +179,30 @@ class _ValueKeeperState extends DeskitWidgetState<ValueKeeper> {
       case ValueKeeperStyle.SMALL:
         body = Container(
           padding: EdgeInsets.all(10),
-          child: Column(
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  minusButton,
-                  Expanded(
-                    child: Padding(
-                      padding: EdgeInsets.all(10),
-                      child: textField,
-                    ),
-                  ),
-                  plusButton,
-                ],
+              minusButton,
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.all(10),
+                  child: textField,
+                ),
               ),
-              resetButton,
+              plusButton,
             ],
           ),
         );
         break;
       case ValueKeeperStyle.LARGE:
         body = Container(
-          padding: EdgeInsets.only(top: 5, bottom: 5, left: 60, right: 10),
-          child: Row(
+          padding: EdgeInsets.only(top: 5, bottom: 5, left: 60, right: 60),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    plusButton,
-                    textField,
-                    minusButton,
-                  ],
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 10),
-                child: resetButton,
-              ),
+              plusButton,
+              textField,
+              minusButton,
             ],
           ),
         );
