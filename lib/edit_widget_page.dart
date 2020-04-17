@@ -360,45 +360,6 @@ class CoinConfigEditList extends ConfigEditList<CoinConfig> {
             children: <Widget>[
               Container(
                 child: Text(
-                  'Number of coins by single toss',
-                  textAlign: TextAlign.left,
-                  style: Style.PreferenceTitle,
-                ),
-              ),
-              Container(
-                child: Text(config.number.toString()),
-              ),
-            ],
-          ),
-        ),
-        onTap: () async {
-          final result = await TextFieldAlertDialog.show(
-              context, 'Edit number of coins', config.number.toString(),
-              inputType: TextInputType.number);
-          if (result != null) {
-            final intResult = int.tryParse(result);
-            final min = 1;
-            final max = CoinConfig.maxNumber;
-            if (intResult != null && intResult >= min && intResult <= max) {
-              parentState.update(() {
-                config.number = intResult;
-              });
-            } else {
-              SnackBarUtil.show(context,
-                  'Number of coins should be an integer between $min and $max.');
-            }
-          }
-        },
-      ),
-      InkWell(
-        child: Container(
-          constraints: itemConstraints,
-          padding: itemPadding,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Container(
-                child: Text(
                   'Display name',
                   textAlign: TextAlign.left,
                   style: Style.PreferenceTitle,
@@ -449,6 +410,58 @@ class CoinConfigEditList extends ConfigEditList<CoinConfig> {
                 onChanged: (value) {
                   parentState.update(() {
                     config.showHistory = value;
+                  });
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+      Container(
+        constraints: itemConstraints,
+        padding: itemPadding,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Container(
+              child: Text(
+                'Long press to request multiple',
+                textAlign: TextAlign.left,
+                style: Style.PreferenceTitle,
+              ),
+            ),
+            Container(
+              child: Switch(
+                value: config.longPressMultiple,
+                onChanged: (value) {
+                  parentState.update(() {
+                    config.longPressMultiple = value;
+                  });
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+      Container(
+        constraints: itemConstraints,
+        padding: itemPadding,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Container(
+              child: Text(
+                'Popup result',
+                textAlign: TextAlign.left,
+                style: Style.PreferenceTitle,
+              ),
+            ),
+            Container(
+              child: Switch(
+                value: config.popupResult,
+                onChanged: (value) {
+                  parentState.update(() {
+                    config.popupResult = value;
                   });
                 },
               ),

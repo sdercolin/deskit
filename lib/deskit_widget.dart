@@ -58,6 +58,15 @@ abstract class DeskitWidgetState<T extends DeskitWidget<T>> extends State<T> {
     data = defaultData;
   }
 
+  @override
+  void setState(fn) {
+    if (mounted) {
+      super.setState(fn);
+    } else {
+      fn.call();
+    }
+  }
+
   Widget wrapWithNameTag(Widget body, String name) {
     if (name.isNotEmpty) {
       return Container(

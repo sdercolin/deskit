@@ -1,5 +1,8 @@
 import 'dart:math';
 
+import 'package:deskit/common/custom_alert_dialog.dart';
+import 'package:deskit/common/snack_bar_util.dart';
+import 'package:deskit/common/text_edit_alert_dialog.dart';
 import 'package:deskit/model/coin_config.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -27,9 +30,8 @@ class _CoinState extends DeskitWidgetState<Coin> {
     updateData(CoinData(newResults));
   }
 
-  void _toss() {
+  void _toss(BuildContext context, int total, bool popup) async {
     final random = Random();
-    final total = widget.config.number;
     var obverse = 0;
     for (var i = 0; i < total; i++) {
       obverse += random.nextBool() ? 1 : 0;
@@ -37,27 +39,83 @@ class _CoinState extends DeskitWidgetState<Coin> {
     final newResults = _results.toList();
     newResults.add(
         CoinTossResult(total, obverse, DateTime.now().millisecondsSinceEpoch));
+
+    if (popup) {
+      final content = total == 1
+          ? Text(
+              obverse > 0 ? 'Obverse' : 'Reverse',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.white, fontSize: 40),
+            )
+          : Column(
+              children: [
+                Text(
+                  'Obverse / Total',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.white, fontSize: 15),
+                ),
+                Text(
+                  '$obverse / $total',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.white, fontSize: 50),
+                )
+              ],
+            );
+
+      await CustomAlertDialog.show(
+          context,
+          Container(
+            padding: EdgeInsets.symmetric(vertical: 30),
+            child: Wrap(
+              alignment: WrapAlignment.center,
+              runAlignment: WrapAlignment.center,
+              children: [content],
+            ),
+          ),
+          backgroundColor:
+              Color.alphaBlend(Color.fromARGB(180, 0, 0, 0), Colors.white));
+    }
+
     setState(() {
       _results = newResults;
     });
+  }
+
+  void _requestMultiple(BuildContext context, bool popup) async {
+    final resultText = await TextFieldAlertDialog.show(
+        context, 'Number of coins', '',
+        inputType: TextInputType.number);
+    if (resultText == null) {
+      return;
+    }
+    final resultInt = int.tryParse(resultText);
+    final min = 1;
+    final max = CoinConfig.maxNumber;
+    if (resultInt != null && resultInt >= min && resultInt <= max) {
+      _toss(context, resultInt, popup);
+    } else {
+      SnackBarUtil.show(
+          context, 'The number should be an integer between $min and $max.');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     preBuild();
     final config = widget.config;
-    final number = config.number;
 
     final fontSize = config.showHistory ? 20.0 : 12.0;
     final button = RaisedButton(
-      color: Colors.amber,
-      child: Text(
-        number > 1 ? 'Coin × ${number}' : 'Coin',
-        style: TextStyle(fontSize: fontSize),
-        textAlign: TextAlign.center,
-      ),
-      onPressed: _toss,
-    );
+        color: Colors.amber,
+        child: Text(
+          'Coin',
+          style: TextStyle(fontSize: fontSize),
+          textAlign: TextAlign.center,
+        ),
+        onPressed: () => _toss(context, 1, config.popupResult),
+        onLongPress: config.longPressMultiple
+            ? () => _requestMultiple(context, config.popupResult)
+            : null);
 
     Widget body;
     if (config.showHistory) {

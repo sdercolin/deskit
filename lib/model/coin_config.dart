@@ -20,14 +20,19 @@ class CoinConfig extends Config<Coin> {
   @override
   final typeInfo = WidgetTypeInfo.COIN;
 
-  static const maxNumber = 10;
+  static const maxNumber = 999;
 
-  int number;
   String name;
   bool showHistory;
+  bool longPressMultiple;
+  bool popupResult;
 
-  CoinConfig({this.number = 1, this.name = '', this.showHistory = true})
-      : super(TYPE);
+  CoinConfig({
+    this.name = '',
+    this.showHistory = true,
+    this.longPressMultiple = true,
+    this.popupResult = true,
+  }) : super(TYPE);
 
   @override
   Coin build(int id, WidgetDataRepository repository, GlobalKey key) {
@@ -46,9 +51,10 @@ class CoinConfig extends Config<Coin> {
 
   factory CoinConfig.fromJson(String json) {
     final item = _$CoinConfigFromJson(jsonDecode(json));
-    item.number ??= 1;
     item.name ??= '';
     item.showHistory ??= true;
+    item.longPressMultiple ??= true;
+    item.popupResult ??= true;
     return item;
   }
 
