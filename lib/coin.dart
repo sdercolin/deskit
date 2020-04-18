@@ -31,7 +31,7 @@ class _CoinState extends DeskitWidgetState<Coin> {
     updateData(CoinData(newResults));
   }
 
-  void _toss(int total, bool popup) async {
+  void _toss(BuildContext context, int total, bool popup) async {
     final random = Random();
     var obverse = 0;
     for (var i = 0; i < total; i++) {
@@ -64,7 +64,7 @@ class _CoinState extends DeskitWidgetState<Coin> {
             );
 
       await CustomAlertDialog.show(
-          scaffoldContext,
+          widget.scaffoldKey.currentContext,
           Container(
             padding: EdgeInsets.symmetric(vertical: 30),
             child: Wrap(
@@ -82,7 +82,7 @@ class _CoinState extends DeskitWidgetState<Coin> {
     });
   }
 
-  void _requestMultiple(bool popup) async {
+  void _requestMultiple(BuildContext context, bool popup) async {
     final resultText = await TextFieldAlertDialog.show(
         scaffoldContext, 'Number of coins', '',
         inputType: TextInputType.number);
@@ -93,7 +93,7 @@ class _CoinState extends DeskitWidgetState<Coin> {
     final min = 1;
     final max = CoinConfig.maxNumber;
     if (resultInt != null && resultInt >= min && resultInt <= max) {
-      _toss(resultInt, popup);
+      _toss(context, resultInt, popup);
     } else {
       SnackBarUtil.show(
           context, 'The number should be an integer between $min and $max.');
@@ -113,9 +113,9 @@ class _CoinState extends DeskitWidgetState<Coin> {
           style: TextStyle(fontSize: fontSize),
           textAlign: TextAlign.center,
         ),
-        onPressed: () => _toss(1, config.popupResult),
+        onPressed: () => _toss(context, 1, config.popupResult),
         onLongPress: config.longPressMultiple
-            ? () => _requestMultiple(config.popupResult)
+            ? () => _requestMultiple(context, config.popupResult)
             : null);
 
     Widget body;

@@ -29,7 +29,7 @@ class _DiceState extends DeskitWidgetState<Dice> {
     updateData(DiceData(newResults));
   }
 
-  void _roll(int number, DiceConfig config) async {
+  void _roll(BuildContext context, int number, DiceConfig config) async {
     int sides;
     if (config.requestSidesEveryTime) {
       final resultText = await TextFieldAlertDialog.show(
@@ -109,7 +109,7 @@ class _DiceState extends DeskitWidgetState<Dice> {
     });
   }
 
-  void _requestMultiple(DiceConfig config) async {
+  void _requestMultiple(BuildContext context, DiceConfig config) async {
     final resultText = await TextFieldAlertDialog.show(
         scaffoldContext, 'Number of dices', '',
         inputType: TextInputType.number);
@@ -120,7 +120,7 @@ class _DiceState extends DeskitWidgetState<Dice> {
     final min = 1;
     final max = DiceConfig.maxNumber;
     if (resultInt != null && resultInt >= min && resultInt <= max) {
-      _roll(resultInt, config);
+      _roll(context, resultInt, config);
     } else {
       SnackBarUtil.show(
           context, 'The number should be an integer between $min and $max.');
@@ -140,9 +140,10 @@ class _DiceState extends DeskitWidgetState<Dice> {
           style: TextStyle(fontSize: fontSize),
           textAlign: TextAlign.center,
         ),
-        onPressed: () => _roll(1, config),
-        onLongPress:
-            config.longPressMultiple ? () => _requestMultiple(config) : null);
+        onPressed: () => _roll(context, 1, config),
+        onLongPress: config.longPressMultiple
+            ? () => _requestMultiple(context, config)
+            : null);
 
     Widget body;
     if (config.showHistory) {
