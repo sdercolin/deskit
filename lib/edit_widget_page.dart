@@ -81,9 +81,6 @@ abstract class ConfigEditList<T extends Config> extends StatelessWidget {
 
   ConfigEditList(this.originalConfig, this.parentState);
 
-  final itemPadding = EdgeInsets.symmetric(horizontal: 20);
-  final itemConstraints = BoxConstraints(minHeight: 60);
-
   List<Widget> buildList(BuildContext context, T config);
 
   @override
@@ -130,218 +127,59 @@ class ValueKeeperConfigEditList extends ConfigEditList<ValueKeeperConfig> {
 
   @override
   List<Widget> buildList(BuildContext context, ValueKeeperConfig config) {
-    return [
-      Container(
-        constraints: itemConstraints,
-        padding: itemPadding,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Container(
-              child: Text(
-                'Style',
-                textAlign: TextAlign.left,
-                style: Style.PreferenceTitle,
-              ),
-            ),
-            DropdownButton<ValueKeeperStyle>(
-              value: config.style,
-              elevation: 16,
-              items: ValueKeeperStyle.values
-                  .map((ValueKeeperStyle value) =>
-                      DropdownMenuItem<ValueKeeperStyle>(
-                        value: value,
-                        child: Text(value.displayName),
-                      ))
-                  .toList(),
-              onChanged: (ValueKeeperStyle value) {
-                parentState.update(() {
-                  config.style = value;
-                });
-              },
-            ),
-          ],
-        ),
-      ),
-      InkWell(
-        child: Container(
-          constraints: itemConstraints,
-          padding: itemPadding,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Container(
-                child: Text(
-                  'Display name',
-                  textAlign: TextAlign.left,
-                  style: Style.PreferenceTitle,
-                ),
-              ),
-              Container(
-                constraints: BoxConstraints(maxWidth: 200),
-                child: config.name.isNotEmpty
-                    ? Text(
-                        config.name,
-                        overflow: TextOverflow.ellipsis,
-                        softWrap: false,
-                      )
-                    : Text(
-                        'Undefined',
-                        style: TextStyle(fontStyle: FontStyle.italic),
-                      ),
-              ),
-            ],
-          ),
-        ),
-        onTap: () async {
-          final result = await TextFieldAlertDialog.show(
-              context, 'Edit display name', config.name);
-          if (result != null) {
-            parentState.update(() {
-              config.name = result;
-            });
+    return <Widget>[
+      _DropdownConfigItem<ValueKeeperStyle>(
+        parentState,
+        'Style',
+        () => config.style,
+        (value) => config.style = value,
+        ValueKeeperStyle.values,
+        ValueKeeperStyle.values.map((e) => e.displayName).toList(),
+      ).build(),
+      _StringEditConfigItem(
+        context,
+        parentState,
+        'Display name',
+        () => config.name,
+        (value) => config.name = value,
+      ).build(),
+      _IntegerEditConfigItem(
+        context,
+        parentState,
+        'Initial value',
+        -ValueKeeperConfig.maxAbsoluteValue,
+        ValueKeeperConfig.maxAbsoluteValue,
+        () => config.initialValue,
+        (value) => config.initialValue = value,
+      ).build(),
+      _IntegerEditConfigItem(
+        context,
+        parentState,
+        'Interval',
+        1,
+        ValueKeeperConfig.maxInterval,
+        () => config.interval,
+        (value) => config.interval = value,
+        isVisible: !config.requestIntervalEveryTime,
+      ).build(),
+      _SwitchConfigItem(
+        parentState,
+        'Display interval',
+        () => config.displayInterval,
+        (value) => config.displayInterval = value,
+        isVisible: !config.requestIntervalEveryTime,
+      ).build(),
+      _SwitchConfigItem(
+        parentState,
+        'Ask for interval every time',
+        () => config.requestIntervalEveryTime,
+        (value) {
+          config.requestIntervalEveryTime = value;
+          if (value) {
+            config.displayInterval = false;
           }
         },
-      ),
-      InkWell(
-        child: Container(
-          constraints: itemConstraints,
-          padding: itemPadding,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Container(
-                child: Text(
-                  'Initial value',
-                  textAlign: TextAlign.left,
-                  style: Style.PreferenceTitle,
-                ),
-              ),
-              Container(
-                child: Text(config.initialValue.toString()),
-              ),
-            ],
-          ),
-        ),
-        onTap: () async {
-          final result = await TextFieldAlertDialog.show(
-              context, 'Edit initial value', config.initialValue.toString(),
-              inputType: TextInputType.number);
-          if (result != null) {
-            final intResult = int.tryParse(result);
-            final min = -ValueKeeperConfig.maxAbsoluteValue;
-            final max = ValueKeeperConfig.maxAbsoluteValue;
-            if (intResult != null && intResult >= min && intResult <= max) {
-              parentState.update(() {
-                config.initialValue = intResult;
-              });
-            } else {
-              SnackBarUtil.show(context,
-                  'Initial value should be an integer between $min and $max.');
-            }
-          }
-        },
-      ),
-      config.requestIntervalEveryTime
-          ? null
-          : InkWell(
-              child: Container(
-                constraints: itemConstraints,
-                padding: itemPadding,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Container(
-                      child: Text(
-                        'Interval',
-                        textAlign: TextAlign.left,
-                        style: Style.PreferenceTitle,
-                      ),
-                    ),
-                    Container(
-                      child: Text(config.interval.toString()),
-                    ),
-                  ],
-                ),
-              ),
-              onTap: () async {
-                final result = await TextFieldAlertDialog.show(
-                    context, 'Edit interval', config.interval.toString(),
-                    inputType: TextInputType.number);
-                if (result != null) {
-                  final intResult = int.tryParse(result);
-                  final max = ValueKeeperConfig.maxInterval;
-                  if (intResult != null && intResult > 0 && intResult <= max) {
-                    parentState.update(() {
-                      config.interval = intResult;
-                    });
-                  } else {
-                    Scaffold.of(context)
-                      ..removeCurrentSnackBar()
-                      ..showSnackBar(SnackBar(
-                          content: Text(
-                              'Interval should be an integer between 1 and $max.')));
-                  }
-                }
-              },
-            ),
-      config.requestIntervalEveryTime
-          ? null
-          : Container(
-              constraints: itemConstraints,
-              padding: itemPadding,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Container(
-                    child: Text(
-                      'Display interval',
-                      textAlign: TextAlign.left,
-                      style: Style.PreferenceTitle,
-                    ),
-                  ),
-                  Container(
-                    child: Switch(
-                      value: config.displayInterval,
-                      onChanged: (value) {
-                        parentState.update(() {
-                          config.displayInterval = value;
-                        });
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-      Container(
-        constraints: itemConstraints,
-        padding: itemPadding,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Container(
-              child: Text(
-                'Ask for interval every time',
-                textAlign: TextAlign.left,
-                style: Style.PreferenceTitle,
-              ),
-            ),
-            Container(
-              child: Switch(
-                value: config.requestIntervalEveryTime,
-                onChanged: (value) {
-                  parentState.update(() {
-                    config.requestIntervalEveryTime = value;
-                    if (value) {
-                      config.displayInterval = false;
-                    }
-                  });
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
+      ).build(),
       SizedBox(height: 10),
     ].where((element) => element != null).toList();
   }
@@ -353,125 +191,32 @@ class CoinConfigEditList extends ConfigEditList<CoinConfig> {
 
   @override
   List<Widget> buildList(BuildContext context, CoinConfig config) {
-    return [
-      InkWell(
-        child: Container(
-          constraints: itemConstraints,
-          padding: itemPadding,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Container(
-                child: Text(
-                  'Display name',
-                  textAlign: TextAlign.left,
-                  style: Style.PreferenceTitle,
-                ),
-              ),
-              Container(
-                constraints: BoxConstraints(maxWidth: 200),
-                child: config.name.isNotEmpty
-                    ? Text(
-                        config.name,
-                        overflow: TextOverflow.ellipsis,
-                        softWrap: false,
-                      )
-                    : Text(
-                        'Undefined',
-                        style: TextStyle(fontStyle: FontStyle.italic),
-                      ),
-              ),
-            ],
-          ),
-        ),
-        onTap: () async {
-          final result = await TextFieldAlertDialog.show(
-              context, 'Edit display name', config.name);
-          if (result != null) {
-            parentState.update(() {
-              config.name = result;
-            });
-          }
-        },
-      ),
-      Container(
-        constraints: itemConstraints,
-        padding: itemPadding,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Container(
-              child: Text(
-                'Show history',
-                textAlign: TextAlign.left,
-                style: Style.PreferenceTitle,
-              ),
-            ),
-            Container(
-              child: Switch(
-                value: config.showHistory,
-                onChanged: (value) {
-                  parentState.update(() {
-                    config.showHistory = value;
-                  });
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-      Container(
-        constraints: itemConstraints,
-        padding: itemPadding,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Container(
-              child: Text(
-                'Long press to request multiple',
-                textAlign: TextAlign.left,
-                style: Style.PreferenceTitle,
-              ),
-            ),
-            Container(
-              child: Switch(
-                value: config.longPressMultiple,
-                onChanged: (value) {
-                  parentState.update(() {
-                    config.longPressMultiple = value;
-                  });
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-      Container(
-        constraints: itemConstraints,
-        padding: itemPadding,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Container(
-              child: Text(
-                'Popup result',
-                textAlign: TextAlign.left,
-                style: Style.PreferenceTitle,
-              ),
-            ),
-            Container(
-              child: Switch(
-                value: config.popupResult,
-                onChanged: (value) {
-                  parentState.update(() {
-                    config.popupResult = value;
-                  });
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
+    return <Widget>[
+      _StringEditConfigItem(
+        context,
+        parentState,
+        'Display name',
+        () => config.name,
+        (value) => config.name = value,
+      ).build(),
+      _SwitchConfigItem(
+        parentState,
+        'Show history',
+        () => config.showHistory,
+        (value) => config.showHistory = value,
+      ).build(),
+      _SwitchConfigItem(
+        parentState,
+        'Long press to request multiple',
+        () => config.longPressMultiple,
+        (value) => config.longPressMultiple = value,
+      ).build(),
+      _SwitchConfigItem(
+        parentState,
+        'Popup result',
+        () => config.popupResult,
+        (value) => config.popupResult = value,
+      ).build(),
       SizedBox(height: 10),
     ];
   }
@@ -483,198 +228,282 @@ class DiceConfigEditList extends ConfigEditList<DiceConfig> {
 
   @override
   List<Widget> buildList(BuildContext context, DiceConfig config) {
-    return [
-      InkWell(
-        child: Container(
-          constraints: itemConstraints,
-          padding: itemPadding,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Container(
-                child: Text(
-                  'Display name',
-                  textAlign: TextAlign.left,
-                  style: Style.PreferenceTitle,
-                ),
-              ),
-              Container(
-                constraints: BoxConstraints(maxWidth: 200),
-                child: config.name.isNotEmpty
-                    ? Text(
-                        config.name,
-                        overflow: TextOverflow.ellipsis,
-                        softWrap: false,
-                      )
-                    : Text(
-                        'Undefined',
-                        style: TextStyle(fontStyle: FontStyle.italic),
-                      ),
-              ),
-            ],
-          ),
-        ),
-        onTap: () async {
-          final result = await TextFieldAlertDialog.show(
-              context, 'Edit display name', config.name);
-          if (result != null) {
-            parentState.update(() {
-              config.name = result;
-            });
-          }
-        },
-      ),
-      config.requestSidesEveryTime
-          ? null
-          : InkWell(
-              child: Container(
-                constraints: itemConstraints,
-                padding: itemPadding,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Container(
-                      child: Text(
-                        'Number of sides',
-                        textAlign: TextAlign.left,
-                        style: Style.PreferenceTitle,
-                      ),
-                    ),
-                    Container(
-                      child: Text(config.sides.toString()),
-                    ),
-                  ],
-                ),
-              ),
-              onTap: () async {
-                final result = await TextFieldAlertDialog.show(
-                    context, 'Edit number of sides', config.sides.toString(),
-                    inputType: TextInputType.number);
-                if (result != null) {
-                  final intResult = int.tryParse(result);
-                  final max = DiceConfig.maxSides;
-                  final min = DiceConfig.minSides;
-                  if (intResult != null &&
-                      intResult >= min &&
-                      intResult <= max) {
-                    parentState.update(() {
-                      config.sides = intResult;
-                    });
-                  } else {
-                    Scaffold.of(context)
-                      ..removeCurrentSnackBar()
-                      ..showSnackBar(SnackBar(
-                          content: Text(
-                              'Number of sides should be an integer between $min and $max.')));
-                  }
-                }
-              },
-            ),
-      Container(
-        constraints: itemConstraints,
-        padding: itemPadding,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Container(
-              child: Text(
-                'Show history',
-                textAlign: TextAlign.left,
-                style: Style.PreferenceTitle,
-              ),
-            ),
-            Container(
-              child: Switch(
-                value: config.showHistory,
-                onChanged: (value) {
-                  parentState.update(() {
-                    config.showHistory = value;
-                  });
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-      Container(
-        constraints: itemConstraints,
-        padding: itemPadding,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Container(
-              child: Text(
-                'Long press to request multiple',
-                textAlign: TextAlign.left,
-                style: Style.PreferenceTitle,
-              ),
-            ),
-            Container(
-              child: Switch(
-                value: config.longPressMultiple,
-                onChanged: (value) {
-                  parentState.update(() {
-                    config.longPressMultiple = value;
-                  });
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-      Container(
-        constraints: itemConstraints,
-        padding: itemPadding,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Container(
-              child: Text(
-                'Popup result',
-                textAlign: TextAlign.left,
-                style: Style.PreferenceTitle,
-              ),
-            ),
-            Container(
-              child: Switch(
-                value: config.popupResult,
-                onChanged: (value) {
-                  parentState.update(() {
-                    config.popupResult = value;
-                  });
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-      Container(
-        constraints: itemConstraints,
-        padding: itemPadding,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Container(
-              child: Text(
-                'Ask for number of sides every time',
-                textAlign: TextAlign.left,
-                style: Style.PreferenceTitle,
-              ),
-            ),
-            Container(
-              child: Switch(
-                value: config.requestSidesEveryTime,
-                onChanged: (value) {
-                  parentState.update(() {
-                    config.requestSidesEveryTime = value;
-                  });
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
+    return <Widget>[
+      _StringEditConfigItem(
+        context,
+        parentState,
+        'Display name',
+        () => config.name,
+        (value) => config.name = value,
+      ).build(),
+      _IntegerEditConfigItem(
+        context,
+        parentState,
+        'Number of sides',
+        DiceConfig.minSides,
+        DiceConfig.maxSides,
+        () => config.sides,
+        (value) => config.sides = value,
+        isVisible: !config.requestSidesEveryTime,
+      ).build(),
+      _SwitchConfigItem(
+        parentState,
+        'Show history',
+        () => config.showHistory,
+        (value) => config.showHistory = value,
+      ).build(),
+      _SwitchConfigItem(
+        parentState,
+        'Long press to request multiple',
+        () => config.longPressMultiple,
+        (value) => config.longPressMultiple = value,
+      ).build(),
+      _SwitchConfigItem(
+        parentState,
+        'Popup result',
+        () => config.popupResult,
+        (value) => config.popupResult = value,
+      ).build(),
+      _SwitchConfigItem(
+        parentState,
+        'Ask for number of sides every time',
+        () => config.requestSidesEveryTime,
+        (value) => config.requestSidesEveryTime = value,
+      ).build(),
       SizedBox(height: 10),
     ].where((element) => element != null).toList();
+  }
+}
+
+abstract class _ConfigItem {
+  final itemPadding = EdgeInsets.symmetric(horizontal: 20);
+  final itemConstraints = BoxConstraints(minHeight: 60);
+  final bool isVisible;
+
+  final EditWidgetPageState parentState;
+
+  _ConfigItem(this.parentState, {this.isVisible = true});
+
+  Widget build();
+}
+
+class _StringEditConfigItem extends _ValueEditConfigItem {
+  _StringEditConfigItem(
+    BuildContext context,
+    EditWidgetPageState parentState,
+    title,
+    getValue,
+    void Function(String) setValue,
+  ) : super(context, parentState, title, getValue, (input) {
+          if (input == null) {
+            return;
+          }
+          parentState.update(() {
+            setValue.call(input);
+          });
+        });
+}
+
+class _IntegerEditConfigItem extends _ValueEditConfigItem {
+  _IntegerEditConfigItem(
+    BuildContext context,
+    parentState,
+    title,
+    int min,
+    int max,
+    int Function() getValue,
+    Function(int) setValue, {
+    isVisible = true,
+  }) : super(
+          context,
+          parentState,
+          title,
+          () => getValue.call().toString(),
+          (input) {
+            if (input == null) {
+              return;
+            }
+            final intResult = int.tryParse(input);
+            if (intResult != null && intResult >= min && intResult <= max) {
+              parentState.update(() {
+                setValue(intResult);
+              });
+            } else {
+              SnackBarUtil.show(context,
+                  '$title should be an integer between $min and $max.');
+            }
+          },
+          inputType: TextInputType.number,
+          isVisible: isVisible,
+        );
+}
+
+abstract class _ValueEditConfigItem extends _ConfigItem {
+  _ValueEditConfigItem(
+    this.context,
+    parentState,
+    this.title,
+    this.getValue,
+    this.setValue, {
+    isVisible = true,
+    this.inputType,
+  }) : super(parentState, isVisible: isVisible);
+
+  final String title;
+  final String Function() getValue;
+  final void Function(String) setValue;
+  final BuildContext context;
+  final TextInputType inputType;
+
+  @override
+  Widget build() {
+    if (!isVisible) {
+      return null;
+    }
+    return InkWell(
+      child: Container(
+        constraints: itemConstraints,
+        padding: itemPadding,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Container(
+              child: Text(
+                title,
+                textAlign: TextAlign.left,
+                style: Style.PreferenceTitle,
+              ),
+            ),
+            Container(
+              constraints: BoxConstraints(maxWidth: 200),
+              child: getValue.call()?.isNotEmpty == true
+                  ? Text(
+                      getValue.call(),
+                      overflow: TextOverflow.ellipsis,
+                      softWrap: false,
+                      textAlign: TextAlign.right,
+                    )
+                  : Text(
+                      'Undefined',
+                      style: TextStyle(fontStyle: FontStyle.italic),
+                    ),
+            ),
+          ],
+        ),
+      ),
+      onTap: () async {
+        final result = await TextFieldAlertDialog.show(
+            context, title, getValue.call(),
+            inputType: inputType);
+        setValue(result);
+      },
+    );
+  }
+}
+
+class _SwitchConfigItem extends _ConfigItem {
+  _SwitchConfigItem(
+    parentState,
+    this.title,
+    this.getValue,
+    this.setValue, {
+    isVisible = true,
+  }) : super(parentState, isVisible: isVisible);
+
+  final String title;
+  final bool Function() getValue;
+  final void Function(bool) setValue;
+
+  @override
+  Widget build() {
+    if (!isVisible) {
+      return null;
+    }
+    return Container(
+      constraints: itemConstraints,
+      padding: itemPadding,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Container(
+            child: Text(
+              title,
+              textAlign: TextAlign.left,
+              style: Style.PreferenceTitle,
+            ),
+          ),
+          Container(
+            child: Switch(
+              value: getValue.call(),
+              onChanged: (value) {
+                parentState.update(() {
+                  setValue.call(value);
+                });
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DropdownConfigItem<T> extends _ConfigItem {
+  _DropdownConfigItem(
+    parentState,
+    this.title,
+    this.getValue,
+    this.setValue,
+    this.options,
+    this.optionNames, {
+    isVisible = true,
+  }) : super(parentState, isVisible: isVisible);
+
+  final String title;
+  final T Function() getValue;
+  final void Function(T) setValue;
+  final List<T> options;
+  final List<String> optionNames;
+
+  @override
+  Widget build() {
+    if (!isVisible) {
+      return null;
+    }
+    return Container(
+      constraints: itemConstraints,
+      padding: itemPadding,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Container(
+            child: Text(
+              title,
+              textAlign: TextAlign.left,
+              style: Style.PreferenceTitle,
+            ),
+          ),
+          DropdownButton<T>(
+            value: getValue.call(),
+            elevation: 16,
+            items: options
+                .asMap()
+                .map((index, value) => MapEntry(
+                    index,
+                    DropdownMenuItem<T>(
+                      value: value,
+                      child: Text(optionNames[index]),
+                    )))
+                .values
+                .toList(),
+            onChanged: (T value) {
+              parentState.update(() {
+                setValue.call(value);
+              });
+            },
+          ),
+        ],
+      ),
+    );
   }
 }
