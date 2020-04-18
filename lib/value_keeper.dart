@@ -96,9 +96,9 @@ class _ValueKeeperState extends DeskitWidgetState<ValueKeeper> {
   }
 
   void _onFocusChange() {
-    setState(() {
-      _isFocus = _focus.hasFocus;
-      if (!_isFocus) {
+    _isFocus = _focus.hasFocus;
+    if (!_isFocus) {
+      setState(() {
         if (_textEditingController.text.isEmpty) {
           _value = (defaultData as ValueKeeperData).value;
         } else {
@@ -108,8 +108,8 @@ class _ValueKeeperState extends DeskitWidgetState<ValueKeeper> {
           }
         }
         setupUI();
-      }
-    });
+      });
+    };
   }
 
   @override
@@ -293,9 +293,15 @@ extension ValueKeeperStyleExtension on ValueKeeperStyle {
   TextStyle getTextFieldStyle(BuildContext context) {
     switch (this) {
       case ValueKeeperStyle.SMALL:
-        return Theme.of(context).textTheme.headline6;
+        return Theme
+            .of(context)
+            .textTheme
+            .headline6;
       case ValueKeeperStyle.LARGE:
-        return Theme.of(context).textTheme.headline3;
+        return Theme
+            .of(context)
+            .textTheme
+            .headline3;
       default:
         return null;
     }
