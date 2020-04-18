@@ -556,7 +556,7 @@ class DiceConfigEditList extends ConfigEditList<DiceConfig> {
                   final max = DiceConfig.maxSides;
                   final min = DiceConfig.minSides;
                   if (intResult != null &&
-                      intResult > min &&
+                      intResult >= min &&
                       intResult <= max) {
                     parentState.update(() {
                       config.sides = intResult;
