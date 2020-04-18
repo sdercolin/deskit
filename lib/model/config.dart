@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:deskit/deskit_widget.dart';
 import 'package:deskit/model/coin_config.dart';
+import 'package:deskit/model/dice_config.dart';
 import 'package:deskit/model/value_keeper_config.dart';
 import 'package:deskit/model/widget_data.dart';
 import 'package:deskit/model/widget_type_info.dart';
@@ -34,6 +35,8 @@ abstract class Config<T extends DeskitWidget> {
         return ValueKeeperConfig.fromJson(jsonString);
       case CoinConfig.TYPE:
         return CoinConfig.fromJson(jsonString);
+      case DiceConfig.TYPE:
+        return DiceConfig.fromJson(jsonString);
       default:
         return null;
     }

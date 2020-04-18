@@ -19,6 +19,8 @@ abstract class DeskitWidgetState<T extends DeskitWidget<T>> extends State<T> {
   WidgetData<T> defaultData;
   WidgetData<T> data;
 
+  BuildContext get scaffoldContext => widget.scaffoldKey.currentContext;
+
   bool verifyData(WidgetData data) {
     return data is WidgetData<T>;
   }

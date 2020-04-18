@@ -1,72 +1,99 @@
 import 'dart:math';
 
-import 'package:deskit/common/custom_alert_dialog.dart';
-import 'package:deskit/common/snack_bar_util.dart';
-import 'package:deskit/common/text_edit_alert_dialog.dart';
-import 'package:deskit/model/coin_config.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:deskit/model/dice_config.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
 
+import 'common/custom_alert_dialog.dart';
+import 'common/snack_bar_util.dart';
+import 'common/text_edit_alert_dialog.dart';
 import 'deskit_widget.dart';
-import 'model/coin_data.dart';
+import 'model/dice_data.dart';
 
-class Coin extends DeskitWidget<Coin> {
-  Coin(this.config, id, repository, key, scaffoldKey)
+class Dice extends DeskitWidget<Dice> {
+  Dice(this.config, id, repository, key, scaffoldKey)
       : super(config, id, repository, key, scaffoldKey);
 
   @override
-  final CoinConfig config;
+  final DiceConfig config;
 
   @override
-  _CoinState createState() {
-    return _CoinState();
+  _DiceState createState() {
+    return _DiceState();
   }
 }
 
-class _CoinState extends DeskitWidgetState<Coin> {
-  List<CoinTossResult> get _results => (data as CoinData).results;
+class _DiceState extends DeskitWidgetState<Dice> {
+  List<DiceRollResult> get _results => (data as DiceData).results;
 
-  set _results(List<CoinTossResult> newResults) {
-    updateData(CoinData(newResults));
+  set _results(List<DiceRollResult> newResults) {
+    updateData(DiceData(newResults));
   }
 
-  void _toss(int total, bool popup) async {
+  void _roll(int number, DiceConfig config) async {
+    int sides;
+    if (config.requestSidesEveryTime) {
+      final resultText = await TextFieldAlertDialog.show(
+          scaffoldContext, 'Number of sides', '',
+          inputType: TextInputType.number);
+      if (resultText == null) {
+        return;
+      }
+      final resultInt = int.tryParse(resultText);
+      final min = DiceConfig.minSides;
+      final max = DiceConfig.maxSides;
+      if (resultInt != null && resultInt >= min && resultInt <= max) {
+        sides = resultInt;
+      } else {
+        SnackBarUtil.show(
+            context, 'The number should be an integer between $min and $max.');
+        return;
+      }
+    }
+
     final random = Random();
-    var obverse = 0;
-    for (var i = 0; i < total; i++) {
-      obverse += random.nextBool() ? 1 : 0;
+    final rolls = <int>[];
+    for (var i = 0; i < number; i++) {
+      final roll = random.nextInt(sides) + 1;
+      rolls.add(roll);
     }
     final newResults = _results.toList();
-    newResults.add(
-        CoinTossResult(total, obverse, DateTime.now().millisecondsSinceEpoch));
+    final newResult =
+        DiceRollResult(number, rolls, DateTime.now().millisecondsSinceEpoch);
+    newResults.add(newResult);
 
-    if (popup) {
-      final content = total == 1
-          ? Text(
-              obverse > 0 ? 'Obverse' : 'Reverse',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white, fontSize: 40),
-            )
-          : Column(
-              children: [
-                Text(
-                  'Obverse / Total',
+    final diceDescription = '${number}d${sides}';
+    final sum = newResult.sum;
+    final details = newResult.rollsText;
+
+    if (config.popupResult) {
+      final content = Column(
+        children: [
+          Text(
+            diceDescription,
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.white, fontSize: 12),
+          ),
+          SizedBox(height: 30),
+          Text(
+            sum.toString(),
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.white, fontSize: 50),
+          ),
+          number > 1 ? SizedBox(height: 30) : null,
+          number > 1
+              ? Text(
+                  details,
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.white, fontSize: 15),
-                ),
-                Text(
-                  '$obverse / $total',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.white, fontSize: 50),
+                  style: TextStyle(color: Colors.white, fontSize: 12),
                 )
-              ],
-            );
+              : null
+        ].where((element) => element != null).toList(),
+      );
 
       await CustomAlertDialog.show(
           scaffoldContext,
           Container(
-            padding: EdgeInsets.symmetric(vertical: 30),
+            padding: EdgeInsets.symmetric(vertical: 10),
             child: Wrap(
               alignment: WrapAlignment.center,
               runAlignment: WrapAlignment.center,
@@ -82,18 +109,18 @@ class _CoinState extends DeskitWidgetState<Coin> {
     });
   }
 
-  void _requestMultiple(bool popup) async {
+  void _requestMultiple(DiceConfig config) async {
     final resultText = await TextFieldAlertDialog.show(
-        scaffoldContext, 'Number of coins', '',
+        scaffoldContext, 'Number of dices', '',
         inputType: TextInputType.number);
     if (resultText == null) {
       return;
     }
     final resultInt = int.tryParse(resultText);
     final min = 1;
-    final max = CoinConfig.maxNumber;
+    final max = DiceConfig.maxNumber;
     if (resultInt != null && resultInt >= min && resultInt <= max) {
-      _toss(resultInt, popup);
+      _roll(resultInt, config);
     } else {
       SnackBarUtil.show(
           context, 'The number should be an integer between $min and $max.');
@@ -109,20 +136,19 @@ class _CoinState extends DeskitWidgetState<Coin> {
     final button = RaisedButton(
         color: Colors.amber,
         child: Text(
-          'Coin',
+          config.requestSidesEveryTime ? 'dX' : 'd${config.sides}',
           style: TextStyle(fontSize: fontSize),
           textAlign: TextAlign.center,
         ),
-        onPressed: () => _toss(1, config.popupResult),
-        onLongPress: config.longPressMultiple
-            ? () => _requestMultiple(config.popupResult)
-            : null);
+        onPressed: () => _roll(1, config),
+        onLongPress:
+            config.longPressMultiple ? () => _requestMultiple(config) : null);
 
     Widget body;
     if (config.showHistory) {
       body = Container(
         padding: EdgeInsets.only(left: 35, right: 35, top: 15, bottom: 20),
-        constraints: BoxConstraints(maxHeight: 130),
+        constraints: BoxConstraints(maxHeight: 150),
         child: Row(
           children: [
             Expanded(
@@ -150,7 +176,7 @@ class _CoinState extends DeskitWidgetState<Coin> {
             SizedBox(width: 20),
             Container(
               height: double.infinity,
-              width: 120,
+              width: 80,
               child: button,
             ),
           ],

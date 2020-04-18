@@ -31,10 +31,10 @@ class _ValueKeeperState extends DeskitWidgetState<ValueKeeper> {
 
   TextEditingController _textEditingController;
 
-  void _increment(BuildContext context) async {
+  void _increment() async {
     int interval;
     if (widget.config.requestIntervalEveryTime) {
-      interval = await _requestInterval(context, true);
+      interval = await _requestInterval(true);
     } else {
       interval = widget.config.interval;
     }
@@ -49,10 +49,10 @@ class _ValueKeeperState extends DeskitWidgetState<ValueKeeper> {
     });
   }
 
-  void _decrement(BuildContext context) async {
+  void _decrement() async {
     int interval;
     if (widget.config.requestIntervalEveryTime) {
-      interval = await _requestInterval(context, false);
+      interval = await _requestInterval(false);
     } else {
       interval = widget.config.interval;
     }
@@ -67,10 +67,10 @@ class _ValueKeeperState extends DeskitWidgetState<ValueKeeper> {
     });
   }
 
-  Future<int> _requestInterval(BuildContext context, bool incremental) async {
+  Future<int> _requestInterval(bool incremental) async {
     final title = incremental ? 'Increment by' : 'Decrement by';
     final inputText = await TextFieldAlertDialog.show(
-      context,
+      scaffoldContext,
       title,
       '',
       inputType: TextInputType.number,
@@ -130,34 +130,34 @@ class _ValueKeeperState extends DeskitWidgetState<ValueKeeper> {
     if (config.requestIntervalEveryTime) {
       plusButton = IconButton(
         icon: Icon(Icons.add_circle_outline),
-        onPressed: () => _increment(context),
+        onPressed: _increment,
         iconSize: config.style.roundButtonSize,
       );
       minusButton = IconButton(
         icon: Icon(Icons.remove_circle_outline),
-        onPressed: () => _decrement(context),
+        onPressed: _decrement,
         iconSize: config.style.roundButtonSize,
       );
     } else if (config.displayInterval) {
       plusButton = FlatButton.icon(
         icon: Icon(Icons.add_circle_outline),
-        onPressed: () => _increment(context),
+        onPressed: _increment,
         label: Text(config.interval.toString()),
       );
       minusButton = FlatButton.icon(
         icon: Icon(Icons.remove_circle_outline),
-        onPressed: () => _decrement(context),
+        onPressed: _decrement,
         label: Text(config.interval.toString()),
       );
     } else {
       plusButton = IconButton(
         icon: Icon(config.style.arrowButtonIconPlus),
-        onPressed: () => _increment(context),
+        onPressed: _increment,
         iconSize: config.style.arrowButtonSize,
       );
       minusButton = IconButton(
         icon: Icon(config.style.arrowButtonIconMinus),
-        onPressed: () => _decrement(context),
+        onPressed: _decrement,
         iconSize: config.style.arrowButtonSize,
       );
     }

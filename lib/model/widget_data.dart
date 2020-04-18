@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:deskit/deskit_widget.dart';
 import 'package:deskit/model/coin_data.dart';
+import 'package:deskit/model/dice_data.dart';
 import 'package:deskit/model/value_keeper_data.dart';
 import 'package:floor/floor.dart';
 
@@ -20,6 +21,8 @@ abstract class WidgetData<T extends DeskitWidget> {
         return ValueKeeperData.fromString(jsonString);
       case CoinData.TYPE:
         return CoinData.fromString(jsonString);
+      case DiceData.TYPE:
+        return DiceData.fromString(jsonString);
       default:
         return null;
     }

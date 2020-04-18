@@ -8,6 +8,7 @@ import 'package:flutter/rendering.dart';
 
 import 'common/text_edit_alert_dialog.dart';
 import 'consts/style.dart';
+import 'model/dice_config.dart';
 import 'model/widget_type_info.dart';
 
 class EditWidgetPage extends StatefulWidget {
@@ -321,7 +322,7 @@ class ValueKeeperConfigEditList extends ConfigEditList<ValueKeeperConfig> {
           children: <Widget>[
             Container(
               child: Text(
-                'Request interval every time',
+                'Ask for interval every time',
                 textAlign: TextAlign.left,
                 style: Style.PreferenceTitle,
               ),
@@ -474,5 +475,207 @@ class CoinConfigEditList extends ConfigEditList<CoinConfig> {
       ),
       SizedBox(height: 10),
     ];
+  }
+}
+
+class DiceConfigEditList extends ConfigEditList<DiceConfig> {
+  DiceConfigEditList(DiceConfig originalConfig, EditWidgetPageState parentState)
+      : super(originalConfig, parentState);
+
+  @override
+  List<Widget> buildList(BuildContext context, DiceConfig config) {
+    return [
+      InkWell(
+        child: Container(
+          constraints: itemConstraints,
+          padding: itemPadding,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Container(
+                child: Text(
+                  'Display name',
+                  textAlign: TextAlign.left,
+                  style: Style.PreferenceTitle,
+                ),
+              ),
+              Container(
+                constraints: BoxConstraints(maxWidth: 200),
+                child: config.name.isNotEmpty
+                    ? Text(
+                        config.name,
+                        overflow: TextOverflow.ellipsis,
+                        softWrap: false,
+                      )
+                    : Text(
+                        'Undefined',
+                        style: TextStyle(fontStyle: FontStyle.italic),
+                      ),
+              ),
+            ],
+          ),
+        ),
+        onTap: () async {
+          final result = await TextFieldAlertDialog.show(
+              context, 'Edit display name', config.name);
+          if (result != null) {
+            parentState.update(() {
+              config.name = result;
+            });
+          }
+        },
+      ),
+      config.requestSidesEveryTime
+          ? null
+          : InkWell(
+              child: Container(
+                constraints: itemConstraints,
+                padding: itemPadding,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Container(
+                      child: Text(
+                        'Number of sides',
+                        textAlign: TextAlign.left,
+                        style: Style.PreferenceTitle,
+                      ),
+                    ),
+                    Container(
+                      child: Text(config.sides.toString()),
+                    ),
+                  ],
+                ),
+              ),
+              onTap: () async {
+                final result = await TextFieldAlertDialog.show(
+                    context, 'Edit number of sides', config.sides.toString(),
+                    inputType: TextInputType.number);
+                if (result != null) {
+                  final intResult = int.tryParse(result);
+                  final max = DiceConfig.maxSides;
+                  final min = DiceConfig.minSides;
+                  if (intResult != null &&
+                      intResult > min &&
+                      intResult <= max) {
+                    parentState.update(() {
+                      config.sides = intResult;
+                    });
+                  } else {
+                    Scaffold.of(context)
+                      ..removeCurrentSnackBar()
+                      ..showSnackBar(SnackBar(
+                          content: Text(
+                              'Number of sides should be an integer between $min and $max.')));
+                  }
+                }
+              },
+            ),
+      Container(
+        constraints: itemConstraints,
+        padding: itemPadding,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Container(
+              child: Text(
+                'Show history',
+                textAlign: TextAlign.left,
+                style: Style.PreferenceTitle,
+              ),
+            ),
+            Container(
+              child: Switch(
+                value: config.showHistory,
+                onChanged: (value) {
+                  parentState.update(() {
+                    config.showHistory = value;
+                  });
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+      Container(
+        constraints: itemConstraints,
+        padding: itemPadding,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Container(
+              child: Text(
+                'Long press to request multiple',
+                textAlign: TextAlign.left,
+                style: Style.PreferenceTitle,
+              ),
+            ),
+            Container(
+              child: Switch(
+                value: config.longPressMultiple,
+                onChanged: (value) {
+                  parentState.update(() {
+                    config.longPressMultiple = value;
+                  });
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+      Container(
+        constraints: itemConstraints,
+        padding: itemPadding,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Container(
+              child: Text(
+                'Popup result',
+                textAlign: TextAlign.left,
+                style: Style.PreferenceTitle,
+              ),
+            ),
+            Container(
+              child: Switch(
+                value: config.popupResult,
+                onChanged: (value) {
+                  parentState.update(() {
+                    config.popupResult = value;
+                  });
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+      Container(
+        constraints: itemConstraints,
+        padding: itemPadding,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Container(
+              child: Text(
+                'Ask for number of sides every time',
+                textAlign: TextAlign.left,
+                style: Style.PreferenceTitle,
+              ),
+            ),
+            Container(
+              child: Switch(
+                value: config.requestSidesEveryTime,
+                onChanged: (value) {
+                  parentState.update(() {
+                    config.requestSidesEveryTime = value;
+                  });
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+      SizedBox(height: 10),
+    ].where((element) => element != null).toList();
   }
 }
