@@ -1,14 +1,13 @@
 import 'package:deskit/common/snack_bar_util.dart';
 import 'package:deskit/common/text_edit_alert_dialog.dart';
 import 'package:deskit/deskit_widget.dart';
+import 'package:deskit/model/value_keeper_config.dart';
+import 'package:deskit/model/value_keeper_data.dart';
 import 'package:flutter/material.dart';
 
-import 'model/value_keeper_config.dart';
-import 'model/value_keeper_data.dart';
-
 class ValueKeeper extends DeskitWidget<ValueKeeper> {
-  ValueKeeper(this.config, id, repository, key, scaffoldKey)
-      : super(config, id, repository, key, scaffoldKey);
+  ValueKeeper(this.config, id, repository, key, scaffoldKey, parentState)
+      : super(config, id, repository, key, scaffoldKey, parentState);
 
   @override
   final ValueKeeperConfig config;
@@ -32,6 +31,7 @@ class _ValueKeeperState extends DeskitWidgetState<ValueKeeper> {
   TextEditingController _textEditingController;
 
   void _increment(BuildContext context) async {
+    onButtonClick();
     int interval;
     if (widget.config.requestIntervalEveryTime) {
       interval = await _requestInterval(context, true);
@@ -50,6 +50,7 @@ class _ValueKeeperState extends DeskitWidgetState<ValueKeeper> {
   }
 
   void _decrement(BuildContext context) async {
+    onButtonClick();
     int interval;
     if (widget.config.requestIntervalEveryTime) {
       interval = await _requestInterval(context, false);
@@ -95,6 +96,11 @@ class _ValueKeeperState extends DeskitWidgetState<ValueKeeper> {
     _focus.unfocus();
   }
 
+  @override
+  void unfocus() {
+    _focus.unfocus();
+  }
+
   void _onFocusChange() {
     _isFocus = _focus.hasFocus;
     if (!_isFocus) {
@@ -109,7 +115,7 @@ class _ValueKeeperState extends DeskitWidgetState<ValueKeeper> {
         }
         setupUI();
       });
-    };
+    }
   }
 
   @override
@@ -293,15 +299,9 @@ extension ValueKeeperStyleExtension on ValueKeeperStyle {
   TextStyle getTextFieldStyle(BuildContext context) {
     switch (this) {
       case ValueKeeperStyle.SMALL:
-        return Theme
-            .of(context)
-            .textTheme
-            .headline6;
+        return Theme.of(context).textTheme.headline6;
       case ValueKeeperStyle.LARGE:
-        return Theme
-            .of(context)
-            .textTheme
-            .headline3;
+        return Theme.of(context).textTheme.headline3;
       default:
         return null;
     }

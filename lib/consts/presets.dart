@@ -2,8 +2,7 @@ import 'package:deskit/model/coin_config.dart';
 import 'package:deskit/model/dice_config.dart';
 import 'package:deskit/model/settings.dart';
 import 'package:deskit/model/value_keeper_config.dart';
-
-import '../value_keeper.dart';
+import 'package:deskit/value_keeper.dart';
 
 class Presets {
   static final defaultSettings = Settings.build(

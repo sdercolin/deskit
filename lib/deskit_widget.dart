@@ -1,18 +1,24 @@
+import 'package:deskit/main.dart';
+import 'package:deskit/model/config.dart';
 import 'package:deskit/model/widget_data.dart';
 import 'package:deskit/repository/widget_data_repository.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import 'model/config.dart';
-
 abstract class DeskitWidget<T> extends StatefulWidget {
-  DeskitWidget(this.config, this.id, this.repository, Key key, this.scaffoldKey)
-      : super(key: key);
+  DeskitWidget(
+    this.config,
+    this.id,
+    this.repository,
+    Key key,
+    this.scaffoldKey,
+    this.parentState,
+  ) : super(key: key);
 
   final Config config;
   final WidgetDataRepository repository;
   final int id;
-  final GlobalKey<ScaffoldState> scaffoldKey;
+  final GlobalKey scaffoldKey;
+  final State parentState;
 }
 
 abstract class DeskitWidgetState<T extends DeskitWidget<T>> extends State<T> {
@@ -45,7 +51,16 @@ abstract class DeskitWidgetState<T extends DeskitWidget<T>> extends State<T> {
     }
   }
 
-  void setupUI();
+  void setupUI() {}
+
+  void unfocus() {}
+
+  void onButtonClick() {
+    final parentState = widget.parentState;
+    if (parentState is HomePageState) {
+      parentState.resetFocus();
+    }
+  }
 
   void reset() {
     setState(() {

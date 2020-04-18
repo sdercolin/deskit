@@ -2,7 +2,6 @@ import 'package:deskit/model/coin_config.dart';
 import 'package:deskit/model/config.dart';
 import 'package:deskit/model/dice_config.dart';
 import 'package:deskit/model/value_keeper_config.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 enum WidgetTypeInfo { VALUE_KEEPER, COIN, DICE }

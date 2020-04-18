@@ -1,16 +1,14 @@
 import 'dart:convert';
 
+import 'package:deskit/edit_widget_page.dart';
+import 'package:deskit/model/config.dart';
 import 'package:deskit/model/value_keeper_data.dart';
 import 'package:deskit/model/widget_data.dart';
 import 'package:deskit/model/widget_type_info.dart';
 import 'package:deskit/repository/widget_data_repository.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:deskit/value_keeper.dart';
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
-
-import '../edit_widget_page.dart';
-import '../value_keeper.dart';
-import 'config.dart';
 
 part 'value_keeper_config.g.dart';
 
@@ -42,8 +40,8 @@ class ValueKeeperConfig extends Config<ValueKeeper> {
 
   @override
   ValueKeeper build(int id, WidgetDataRepository repository, GlobalKey key,
-      GlobalKey<ScaffoldState> scaffoldKey) {
-    return ValueKeeper(this, id, repository, key, scaffoldKey);
+      GlobalKey scaffoldKey, State parentState) {
+    return ValueKeeper(this, id, repository, key, scaffoldKey, parentState);
   }
 
   @override

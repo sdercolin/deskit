@@ -5,14 +5,12 @@ import 'package:deskit/common/snack_bar_util.dart';
 import 'package:deskit/consts/presets.dart';
 import 'package:deskit/deskit_widget.dart';
 import 'package:deskit/edit_widget_page.dart';
+import 'package:deskit/model/settings.dart';
 import 'package:deskit/repository/settings_repository.dart';
 import 'package:deskit/repository/widget_data_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-
-import 'common/focus_util.dart';
-import 'model/settings.dart';
 
 void main() {
   runApp(MyApp());
@@ -29,7 +27,10 @@ class MyApp extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
-        FocusUtil.unfocusAll(context);
+        final currentFocus = FocusScope.of(context);
+        if (!currentFocus.hasPrimaryFocus) {
+          currentFocus.requestFocus(FocusNode());
+        }
       },
       child: MaterialApp(
         title: title,
@@ -37,7 +38,7 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.amber,
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
-        home: MyHomePage(title: title),
+        home: HomePage(title: title),
         routes: {
           EditWidgetPage.routeName: (context) => EditWidgetPage(),
           AddWidgetPage.routeName: (context) => AddWidgetPage(),
@@ -47,17 +48,17 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+class HomePage extends StatefulWidget {
+  HomePage({Key key, this.title}) : super(key: key);
 
   final String title;
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  HomePageState createState() => HomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  final key = GlobalKey<ScaffoldState>();
+class HomePageState extends State<HomePage> {
+  final key = GlobalKey<HomePageState>();
 
   var _reordering = false;
 
@@ -88,13 +89,19 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  void resetFocus() {
+    _myWidgetStateKeys.forEach((element) {
+      element.currentState.unfocus();
+    });
+  }
+
   void _writeDefaultSettings() async {
     await _settingsRepository.add(default_settings);
     await _settingsRepository.select(default_settings.id);
   }
 
   void _confirmRemoveWidget(BuildContext context, int index) {
-    FocusUtil.unfocusAll(context);
+    resetFocus();
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
@@ -122,7 +129,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _confirmResetAll(BuildContext context) {
-    FocusUtil.unfocusAll(context);
+    resetFocus();
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
@@ -140,7 +147,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 key.currentState.reset();
               });
               Navigator.pop(context);
-              FocusUtil.unfocusAll(context);
+              resetFocus();
             },
           ),
         ],
@@ -150,11 +157,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _resetWidget(BuildContext context, int index) async {
     _myWidgetStateKeys[index].currentState.reset();
-    FocusUtil.unfocusAll(context);
+    resetFocus();
   }
 
   void _editWidget(BuildContext context, Settings settings, int index) async {
-    FocusUtil.unfocusAll(context);
+    resetFocus();
     final result = await Navigator.pushNamed(
       context,
       EditWidgetPage.routeName,
@@ -174,7 +181,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _toggleReordering(BuildContext context) {
-    FocusUtil.unfocusAll(context);
+    resetFocus();
     setState(() {
       _reordering = !_reordering;
     });
@@ -224,7 +231,8 @@ class _MyHomePageState extends State<MyHomePage> {
     settings.configs.asMap().forEach((index, config) {
       final widgetKey = GlobalKey<DeskitWidgetState>();
       _myWidgetStateKeys.add(widgetKey);
-      final widget = config.build(index, _widgetDataRepository, widgetKey, key);
+      final widget =
+          config.build(index, _widgetDataRepository, widgetKey, key, this);
       widgetWrappers.add(Wrap(
         key: Key(index.toString()),
         children: [

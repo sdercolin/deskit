@@ -1,16 +1,14 @@
 import 'dart:convert';
 
+import 'package:deskit/dice.dart';
+import 'package:deskit/edit_widget_page.dart';
+import 'package:deskit/model/config.dart';
 import 'package:deskit/model/dice_data.dart';
 import 'package:deskit/model/widget_data.dart';
 import 'package:deskit/model/widget_type_info.dart';
 import 'package:deskit/repository/widget_data_repository.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
-
-import '../dice.dart';
-import '../edit_widget_page.dart';
-import 'config.dart';
 
 part 'dice_config.g.dart';
 
@@ -43,8 +41,8 @@ class DiceConfig extends Config<Dice> {
 
   @override
   Dice build(int id, WidgetDataRepository repository, GlobalKey key,
-      GlobalKey<ScaffoldState> scaffoldKey) {
-    return Dice(this, id, repository, key, scaffoldKey);
+      GlobalKey scaffoldKey, State parentState) {
+    return Dice(this, id, repository, key, scaffoldKey, parentState);
   }
 
   @override

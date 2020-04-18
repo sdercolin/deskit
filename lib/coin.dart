@@ -3,17 +3,15 @@ import 'dart:math';
 import 'package:deskit/common/custom_alert_dialog.dart';
 import 'package:deskit/common/snack_bar_util.dart';
 import 'package:deskit/common/text_edit_alert_dialog.dart';
+import 'package:deskit/deskit_widget.dart';
 import 'package:deskit/model/coin_config.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:deskit/model/coin_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 
-import 'deskit_widget.dart';
-import 'model/coin_data.dart';
-
 class Coin extends DeskitWidget<Coin> {
-  Coin(this.config, id, repository, key, scaffoldKey)
-      : super(config, id, repository, key, scaffoldKey);
+  Coin(this.config, id, repository, key, scaffoldKey, parentState)
+      : super(config, id, repository, key, scaffoldKey, parentState);
 
   @override
   final CoinConfig config;
@@ -32,6 +30,7 @@ class _CoinState extends DeskitWidgetState<Coin> {
   }
 
   void _toss(BuildContext context, int total, bool popup) async {
+    onButtonClick();
     final random = Random();
     var obverse = 0;
     for (var i = 0; i < total; i++) {
@@ -83,6 +82,7 @@ class _CoinState extends DeskitWidgetState<Coin> {
   }
 
   void _requestMultiple(BuildContext context, bool popup) async {
+    onButtonClick();
     final resultText = await TextFieldAlertDialog.show(
         scaffoldContext, 'Number of coins', '',
         inputType: TextInputType.number);
@@ -187,7 +187,4 @@ class _CoinState extends DeskitWidgetState<Coin> {
     }
     return wrapWithNameTag(body, config.name);
   }
-
-  @override
-  void setupUI() {}
 }

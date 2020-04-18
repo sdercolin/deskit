@@ -1,16 +1,14 @@
 import 'dart:convert';
 
 import 'package:deskit/coin.dart';
+import 'package:deskit/edit_widget_page.dart';
 import 'package:deskit/model/coin_data.dart';
+import 'package:deskit/model/config.dart';
 import 'package:deskit/model/widget_data.dart';
 import 'package:deskit/model/widget_type_info.dart';
 import 'package:deskit/repository/widget_data_repository.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
-
-import '../edit_widget_page.dart';
-import 'config.dart';
 
 part 'coin_config.g.dart';
 
@@ -37,8 +35,8 @@ class CoinConfig extends Config<Coin> {
 
   @override
   Coin build(int id, WidgetDataRepository repository, GlobalKey key,
-      GlobalKey<ScaffoldState> scaffoldKey) {
-    return Coin(this, id, repository, key, scaffoldKey);
+      GlobalKey scaffoldKey, State parentState) {
+    return Coin(this, id, repository, key, scaffoldKey, parentState);
   }
 
   @override

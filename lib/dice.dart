@@ -1,17 +1,16 @@
 import 'dart:math';
 
+import 'package:deskit/common/custom_alert_dialog.dart';
+import 'package:deskit/common/snack_bar_util.dart';
+import 'package:deskit/common/text_edit_alert_dialog.dart';
+import 'package:deskit/deskit_widget.dart';
 import 'package:deskit/model/dice_config.dart';
+import 'package:deskit/model/dice_data.dart';
 import 'package:flutter/material.dart';
 
-import 'common/custom_alert_dialog.dart';
-import 'common/snack_bar_util.dart';
-import 'common/text_edit_alert_dialog.dart';
-import 'deskit_widget.dart';
-import 'model/dice_data.dart';
-
 class Dice extends DeskitWidget<Dice> {
-  Dice(this.config, id, repository, key, scaffoldKey)
-      : super(config, id, repository, key, scaffoldKey);
+  Dice(this.config, id, repository, key, scaffoldKey, parentState)
+      : super(config, id, repository, key, scaffoldKey, parentState);
 
   @override
   final DiceConfig config;
@@ -30,6 +29,7 @@ class _DiceState extends DeskitWidgetState<Dice> {
   }
 
   void _roll(BuildContext context, int number, DiceConfig config) async {
+    onButtonClick();
     int sides;
     if (config.requestSidesEveryTime) {
       final resultText = await TextFieldAlertDialog.show(
@@ -112,6 +112,7 @@ class _DiceState extends DeskitWidgetState<Dice> {
   }
 
   void _requestMultiple(BuildContext context, DiceConfig config) async {
+    onButtonClick();
     final resultText = await TextFieldAlertDialog.show(
         scaffoldContext, 'Number of dices', '',
         inputType: TextInputType.number);
@@ -216,7 +217,4 @@ class _DiceState extends DeskitWidgetState<Dice> {
     }
     return wrapWithNameTag(body, config.name);
   }
-
-  @override
-  void setupUI() {}
 }

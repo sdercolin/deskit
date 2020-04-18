@@ -1,15 +1,14 @@
 import 'package:deskit/common/snack_bar_util.dart';
+import 'package:deskit/common/text_edit_alert_dialog.dart';
+import 'package:deskit/consts/style.dart';
 import 'package:deskit/model/coin_config.dart';
 import 'package:deskit/model/config.dart';
+import 'package:deskit/model/dice_config.dart';
 import 'package:deskit/model/value_keeper_config.dart';
+import 'package:deskit/model/widget_type_info.dart';
 import 'package:deskit/value_keeper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-
-import 'common/text_edit_alert_dialog.dart';
-import 'consts/style.dart';
-import 'model/dice_config.dart';
-import 'model/widget_type_info.dart';
 
 class EditWidgetPage extends StatefulWidget {
   static const routeName = '/editWidget';
@@ -36,7 +35,7 @@ class EditWidgetPageState extends State<EditWidgetPage> {
 
     currentConfig ??= args.originalConfig.copy();
 
-    final preview = currentConfig.build(null, null, null, key);
+    final preview = currentConfig.build(null, null, null, key, this);
     final list = currentConfig.buildEditList(this);
     final typeName = currentConfig.typeInfo.name;
     final title =
