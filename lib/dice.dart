@@ -48,6 +48,8 @@ class _DiceState extends DeskitWidgetState<Dice> {
             context, 'The number should be an integer between $min and $max.');
         return;
       }
+    } else {
+      sides = config.sides;
     }
 
     final random = Random();
