@@ -167,11 +167,14 @@ class _CoinState extends DeskitWidgetState<Coin> {
                 alignment: Alignment.center,
                 color: Color.fromARGB(5, 0, 0, 0),
                 padding: EdgeInsets.all(10),
-                child: Text(
-                  _results.isEmpty
-                      ? 'No result'
-                      : _results.last.buildSimpleText(),
-                  style: TextStyle(fontSize: 16),
+                child: FittedBox(
+                  fit: BoxFit.fitWidth,
+                  child: Text(
+                    _results.isEmpty
+                        ? 'No result'
+                        : _results.last.buildSimpleText(),
+                    style: TextStyle(fontSize: 16),
+                  ),
                 ),
               ),
             ),
