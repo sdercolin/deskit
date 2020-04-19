@@ -156,81 +156,127 @@ class _TimerState extends DeskitWidgetState<Timer>
 
     final config = widget.config;
 
+    final resetButton = IconButton(
+      iconSize: config.showProgressBar ? 55 : 50,
+      icon: Icon(
+        _running ? Icons.clear : Icons.refresh,
+        color: Color.fromARGB(60, 0, 0, 0),
+      ),
+      onPressed: reset,
+    );
+
+    final startStopButton = IconButton(
+      iconSize: config.showProgressBar ? 60 : 55,
+      icon: Icon(
+        _running ? Icons.pause_circle_filled : Icons.play_circle_filled,
+        color: Colors.amber,
+      ),
+      onPressed: () {
+        if (!_running) {
+          _run();
+        } else {
+          setState(() {
+            _stop();
+          });
+        }
+      },
+    );
+
     Widget body;
 
-    body = Container(
-      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-      width: double.infinity,
-      child: FittedBox(
-        fit: BoxFit.fitWidth,
+    if (config.showProgressBar) {
+      body = Container(
+        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+        width: double.infinity,
+        child: FittedBox(
+          fit: BoxFit.fitWidth,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(width: 10),
+              resetButton,
+              SizedBox(width: 25),
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  SizedBox(
+                    child: AnimatedBuilder(
+                      animation: _animationController,
+                      builder: (context, child) {
+                        return CircularProgressIndicator(
+                          value: _running ? _animation?.value : _progress,
+                          backgroundColor: Color.alphaBlend(
+                              Color.fromARGB(230, 255, 255, 255), Colors.amber),
+                        );
+                      },
+                    ),
+                    height: 150,
+                    width: 150,
+                  ),
+                  Column(
+                    children: [
+                      Text(
+                        DurationUtil.formatSeconds(_now),
+                        style: TextStyle(
+                          fontSize: 40,
+                          color: Colors.black54,
+                          fontWeight: FontWeight.w300,
+                        ),
+                      ),
+                      Text(
+                        DurationUtil.formatSeconds(_total),
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.black54,
+                          fontWeight: FontWeight.w300,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              SizedBox(width: 20),
+              startStopButton,
+            ],
+          ),
+        ),
+      );
+    } else {
+      body = Container(
+        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        width: double.infinity,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SizedBox(width: 10),
-            IconButton(
-              iconSize: 55,
-              icon: Icon(
-                _running ? Icons.clear : Icons.refresh,
-                color: Color.fromARGB(60, 0, 0, 0),
-              ),
-              onPressed: reset,
-            ),
-            SizedBox(width: 25),
-            Stack(
-              alignment: Alignment.center,
-              children: [
-                SizedBox(
-                  child: AnimatedBuilder(
-                    animation: _animationController,
-                    builder: (context, child) {
-                      return CircularProgressIndicator(
-                        value: _running ? _animation?.value : _progress,
-                        backgroundColor: Color.alphaBlend(
-                            Color.fromARGB(230, 255, 255, 255), Colors.amber),
-                      );
-                    },
+            resetButton,
+            Expanded(
+              child: Column(
+                children: [
+                  Text(
+                    DurationUtil.formatSeconds(_now),
+                    style: TextStyle(
+                      fontSize: 43,
+                      color: Colors.black54,
+                      fontWeight: FontWeight.w300,
+                    ),
                   ),
-                  height: 150,
-                  width: 150,
-                ),
-                Column(
-                  children: [
-                    Text(
-                      DurationUtil.formatSeconds(_now),
-                      style: Theme.of(context).textTheme.headline4,
+                  Text(
+                    DurationUtil.formatSeconds(_total),
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.black54,
+                      fontWeight: FontWeight.w300,
                     ),
-                    Text(
-                      DurationUtil.formatSeconds(_total),
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w300,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            SizedBox(width: 20),
-            IconButton(
-              iconSize: 65,
-              icon: Icon(
-                _running ? Icons.pause_circle_filled : Icons.play_circle_filled,
-                color: Colors.amber,
+                  ),
+                ],
               ),
-              onPressed: () {
-                if (!_running) {
-                  _run();
-                } else {
-                  setState(() {
-                    _stop();
-                  });
-                }
-              },
             ),
+            startStopButton
           ],
         ),
-      ),
-    );
+      );
+    }
 
     return wrapWithNameTag(body, config.name);
   }
@@ -239,20 +285,5 @@ class _TimerState extends DeskitWidgetState<Timer>
   void dispose() {
     _animationController?.dispose();
     super.dispose();
-  }
-}
-
-enum TimerStyle { CIRCULAR, LINEAR }
-
-extension TimerStyleExtension on TimerStyle {
-  String get displayName {
-    switch (this) {
-      case TimerStyle.CIRCULAR:
-        return 'Circular';
-      case TimerStyle.LINEAR:
-        return 'Linear';
-      default:
-        return null;
-    }
   }
 }

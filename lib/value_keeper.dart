@@ -299,9 +299,9 @@ extension ValueKeeperStyleExtension on ValueKeeperStyle {
   TextStyle getTextFieldStyle(BuildContext context) {
     switch (this) {
       case ValueKeeperStyle.SMALL:
-        return Theme.of(context).textTheme.headline6;
+        return TextStyle(fontSize: 24, fontWeight: FontWeight.w400);
       case ValueKeeperStyle.LARGE:
-        return Theme.of(context).textTheme.headline3;
+        return TextStyle(fontSize: 40, fontWeight: FontWeight.w300);
       default:
         return null;
     }

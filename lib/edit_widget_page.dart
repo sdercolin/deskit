@@ -11,7 +11,6 @@ import 'package:deskit/model/dice_config.dart';
 import 'package:deskit/model/timer_config.dart';
 import 'package:deskit/model/value_keeper_config.dart';
 import 'package:deskit/model/widget_type_info.dart';
-import 'package:deskit/timer.dart';
 import 'package:deskit/value_keeper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -290,14 +289,6 @@ class TimerConfigEditList extends ConfigEditList<TimerConfig> {
   @override
   List<Widget> buildList(BuildContext context, TimerConfig config) {
     return <Widget>[
-      _DropdownConfigItem<TimerStyle>(
-        parentState,
-        'Style',
-        () => config.style,
-        (value) => config.style = value,
-        TimerStyle.values,
-        TimerStyle.values.map((e) => e.displayName).toList(),
-      ).build(),
       _StringEditConfigItem(
         context,
         parentState,
@@ -312,6 +303,12 @@ class TimerConfigEditList extends ConfigEditList<TimerConfig> {
         () => config.totalSec,
         (value) => config.totalSec = value,
         isVisible: !config.requestTotalEveryTime,
+      ).build(),
+      _SwitchConfigItem(
+        parentState,
+        'Show progress bar',
+        () => config.showProgressBar,
+        (value) => config.showProgressBar = value,
       ).build(),
       _SwitchConfigItem(
         parentState,

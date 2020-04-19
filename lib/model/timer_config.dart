@@ -20,16 +20,16 @@ class TimerConfig extends Config<Timer> {
   final typeInfo = WidgetTypeInfo.TIMER;
 
   String name;
-  TimerStyle style;
   int totalSec;
+  bool showProgressBar;
   bool vibrate;
   bool sound;
   bool requestTotalEveryTime;
 
   TimerConfig({
     this.name = '',
-    this.style = TimerStyle.CIRCULAR,
     this.totalSec = 60,
+    this.showProgressBar = true,
     this.vibrate = true,
     this.sound = false,
     this.requestTotalEveryTime = false,
@@ -57,8 +57,8 @@ class TimerConfig extends Config<Timer> {
   factory TimerConfig.fromJson(String json) {
     final item = _$TimerConfigFromJson(jsonDecode(json));
     item.name ??= '';
-    item.style ??= TimerStyle.CIRCULAR;
     item.totalSec ??= 60;
+    item.showProgressBar ??= true;
     item.vibrate ??= true;
     item.sound ??= false;
     item.requestTotalEveryTime ??= false;
