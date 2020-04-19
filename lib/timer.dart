@@ -103,73 +103,76 @@ class _TimerState extends DeskitWidgetState<Timer>
 
     Widget body;
 
-    body = Container(
-      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SizedBox(width: 10),
-          IconButton(
-            iconSize: 55,
-            icon: Icon(
-              _running ? Icons.clear : Icons.refresh,
-              color: Color.fromARGB(60, 0, 0, 0),
+    body = FittedBox(
+      fit: BoxFit.fitWidth,
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(width: 10),
+            IconButton(
+              iconSize: 55,
+              icon: Icon(
+                _running ? Icons.clear : Icons.refresh,
+                color: Color.fromARGB(60, 0, 0, 0),
+              ),
+              onPressed: reset,
             ),
-            onPressed: reset,
-          ),
-          SizedBox(width: 25),
-          Stack(
-            alignment: Alignment.center,
-            children: [
-              SizedBox(
-                child: AnimatedBuilder(
-                  animation: _animationController,
-                  builder: (context, child) {
-                    return CircularProgressIndicator(
-                      value: _running ? _animation?.value : _progress,
-                      backgroundColor: Color.alphaBlend(
-                          Color.fromARGB(230, 255, 255, 255), Colors.amber),
-                    );
-                  },
+            SizedBox(width: 25),
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                SizedBox(
+                  child: AnimatedBuilder(
+                    animation: _animationController,
+                    builder: (context, child) {
+                      return CircularProgressIndicator(
+                        value: _running ? _animation?.value : _progress,
+                        backgroundColor: Color.alphaBlend(
+                            Color.fromARGB(230, 255, 255, 255), Colors.amber),
+                      );
+                    },
+                  ),
+                  height: 150,
+                  width: 150,
                 ),
-                height: 150,
-                width: 150,
-              ),
-              Column(
-                children: [
-                  Text(
-                    DurationUtil.formatSeconds(_now),
-                    style: Theme.of(context).textTheme.headline4,
-                  ),
-                  Text(
-                    DurationUtil.formatSeconds(_total),
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w300,
+                Column(
+                  children: [
+                    Text(
+                      DurationUtil.formatSeconds(_now),
+                      style: Theme.of(context).textTheme.headline4,
                     ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          SizedBox(width: 20),
-          IconButton(
-            iconSize: 65,
-            icon: Icon(
-              _running ? Icons.pause_circle_filled : Icons.play_circle_filled,
-              color: Colors.amber,
+                    Text(
+                      DurationUtil.formatSeconds(_total),
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w300,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
-            onPressed: () {
-              if (!_running) {
-                _run();
-              } else {
-                setState(() {
-                  _stop();
-                });
-              }
-            },
-          ),
-        ],
+            SizedBox(width: 20),
+            IconButton(
+              iconSize: 65,
+              icon: Icon(
+                _running ? Icons.pause_circle_filled : Icons.play_circle_filled,
+                color: Colors.amber,
+              ),
+              onPressed: () {
+                if (!_running) {
+                  _run();
+                } else {
+                  setState(() {
+                    _stop();
+                  });
+                }
+              },
+            ),
+          ],
+        ),
       ),
     );
 
