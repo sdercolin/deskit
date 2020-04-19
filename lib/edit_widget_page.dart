@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:deskit/common/snack_bar_util.dart';
 import 'package:deskit/common/text_edit_alert_dialog.dart';
 import 'package:deskit/common/time_picker_alert_dialog.dart';
@@ -329,6 +331,28 @@ class TimerConfigEditList extends ConfigEditList<TimerConfig> {
         () => config.requestTotalEveryTime,
         (value) => config.requestTotalEveryTime = value,
       ).build(),
+      (config.sound || config.vibrate)
+          ? Container(
+              color: Color.alphaBlend(Colors.white38, Colors.amber),
+              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Note:',
+                    style: Style.PreferenceTitle,
+                  ),
+                  SizedBox(height: 5),
+                  Text(
+                    Platform.isIOS
+                        ? 'Vibration and sound would only be played in a short duration and only once; If your device is in silent mode, the sound would not be played.'
+                        : 'Vibration and sound would only be played for at most 10 seconds.',
+                    style: TextStyle(fontSize: 14, color: Colors.black),
+                  ),
+                ],
+              ),
+            )
+          : SizedBox.shrink(),
       SizedBox(height: 10),
     ];
   }
