@@ -11,6 +11,7 @@ import 'package:deskit/repository/widget_data_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:wakelock/wakelock.dart';
 
 void main() {
   runApp(MyApp());
@@ -291,6 +292,7 @@ class HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    Wakelock.enable();
     return Scaffold(
       key: key,
       appBar: AppBar(

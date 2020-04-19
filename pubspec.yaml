@@ -36,6 +36,7 @@ dependencies:
   json_serializable: ^3.3.0
   flutter_ringtone_player: ^2.0.0
   vibration: ^1.2.4
+  wakelock: ^0.1.4+1
 
 dev_dependencies:
   pedantic: ^1.9.0

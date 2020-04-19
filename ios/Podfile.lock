@@ -10,12 +10,15 @@ PODS:
     - FMDB (~> 2.7.2)
   - vibration (1.2.4):
     - Flutter
+  - wakelock (0.0.1):
+    - Flutter
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
   - flutter_ringtone_player (from `.symlinks/plugins/flutter_ringtone_player/ios`)
   - sqflite (from `.symlinks/plugins/sqflite/ios`)
   - vibration (from `.symlinks/plugins/vibration/ios`)
+  - wakelock (from `.symlinks/plugins/wakelock/ios`)
 
 SPEC REPOS:
   trunk:
@@ -30,6 +33,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/sqflite/ios"
   vibration:
     :path: ".symlinks/plugins/vibration/ios"
+  wakelock:
+    :path: ".symlinks/plugins/wakelock/ios"
 
 SPEC CHECKSUMS:
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
@@ -37,6 +42,7 @@ SPEC CHECKSUMS:
   FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
   sqflite: 4001a31ff81d210346b500c55b17f4d6c7589dd0
   vibration: f0c5bb486671fb81e973bfb451d89f8efd07c9c9
+  wakelock: 0d4a70faf8950410735e3f61fb15d517c8a6efc4
 
 PODFILE CHECKSUM: c34e2287a9ccaa606aeceab922830efb9a6ff69a
 
