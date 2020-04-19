@@ -7,6 +7,7 @@ import 'package:deskit/model/timer_config.dart';
 import 'package:deskit/model/timer_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
+import 'package:vibration/vibration.dart';
 
 class Timer extends DeskitWidget<Timer> {
   Timer(this.config, id, repository, key, scaffoldKey, parentState)
@@ -71,7 +72,7 @@ class _TimerState extends DeskitWidgetState<Timer>
           _now = _now - 1;
           if (_now == 0) {
             reset();
-            notifyFinish();
+            _notifyFinish();
           }
         });
       },
@@ -95,10 +96,37 @@ class _TimerState extends DeskitWidgetState<Timer>
     _startAnimation(stop: true);
   }
 
-  void notifyFinish() async {
-    if (widget.config.sound) {
-      await FlutterRingtonePlayer.playAlarm();
+  void vibrate() async {
+    if (widget.config.vibrate && await Vibration.hasVibrator()) {
+      await Vibration.vibrate(pattern: List.filled(30, 500));
     }
+  }
+
+  void cancelVibration() async {
+    try {
+      await Vibration.cancel();
+    } catch (e) {
+      debugPrint(e);
+    }
+  }
+
+  void playAlarm() async {
+    if (widget.config.sound) {
+      await FlutterRingtonePlayer.playAlarm(looping: true);
+    }
+  }
+
+  void cancelAlarm() async {
+    await FlutterRingtonePlayer.stop();
+  }
+
+  void _notifyFinish() async {
+    vibrate();
+    playAlarm();
+    final task = async.Timer(Duration(seconds: 10), () {
+      cancelAlarm();
+      cancelVibration();
+    });
     await CustomAlertDialog.show(
         widget.scaffoldKey.currentContext,
         Container(
@@ -116,8 +144,9 @@ class _TimerState extends DeskitWidgetState<Timer>
         ),
         backgroundColor:
             Color.alphaBlend(Color.fromARGB(180, 0, 0, 0), Colors.white));
-    if (widget.config.sound) {
-      await FlutterRingtonePlayer.stop();
+    if (task.isActive) {
+      cancelAlarm();
+      cancelVibration();
     }
   }
 

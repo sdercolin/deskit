@@ -47,3 +47,4 @@ app.*.map.json
 key.properties
 outputs
 .last_build_id
+.gradle
