@@ -1,4 +1,6 @@
+import 'package:deskit/common/snack_bar_util.dart';
 import 'package:deskit/edit_widget_page.dart';
+import 'package:deskit/model/settings.dart';
 import 'package:deskit/model/widget_type_info.dart';
 import 'package:flutter/material.dart';
 
@@ -7,6 +9,10 @@ class AddWidgetPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AddWidgetPageArguments args =
+        ModalRoute.of(context).settings.arguments;
+    final currentSettings = args.currentSettings;
+
     final types = WidgetTypeInfo.values;
 
     return Scaffold(
@@ -33,6 +39,15 @@ class AddWidgetPage extends StatelessWidget {
               child: Text(type.description),
             ),
             onTap: () async {
+              if (!type.allowMultiple) {
+                if (currentSettings.configs
+                    .any((element) => element.typeInfo == type)) {
+                  SnackBarUtil.show(context,
+                      '${type.name} could not be added more than once.');
+                  return;
+                }
+              }
+
               final result = await Navigator.pushNamed(
                 context,
                 EditWidgetPage.routeName,
@@ -48,4 +63,10 @@ class AddWidgetPage extends StatelessWidget {
       }),
     );
   }
+}
+
+class AddWidgetPageArguments {
+  final Settings currentSettings;
+
+  AddWidgetPageArguments(this.currentSettings);
 }

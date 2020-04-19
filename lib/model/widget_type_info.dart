@@ -67,4 +67,11 @@ extension WidgetTypeInfoExtension on WidgetTypeInfo {
         return null;
     }
   }
+
+  bool get allowMultiple {
+    if (this == WidgetTypeInfo.TIMER) {
+      return false;
+    }
+    return true;
+  }
 }

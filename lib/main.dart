@@ -206,7 +206,9 @@ class HomePageState extends State<HomePage> {
   }
 
   void _addWidget(BuildContext context) async {
-    final result = await Navigator.pushNamed(context, AddWidgetPage.routeName);
+    final currentSettings = _settingsRepository.getCurrent();
+    final result = await Navigator.pushNamed(context, AddWidgetPage.routeName,
+        arguments: AddWidgetPageArguments(currentSettings));
     if (result != null) {
       final current = _settingsRepository.getCurrent();
       final configs = current.configs.toList();
