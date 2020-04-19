@@ -1,5 +1,6 @@
 import 'dart:async' as async;
 
+import 'package:deskit/common/custom_alert_dialog.dart';
 import 'package:deskit/common/time_util.dart';
 import 'package:deskit/deskit_widget.dart';
 import 'package:deskit/model/timer_config.dart';
@@ -103,10 +104,11 @@ class _TimerState extends DeskitWidgetState<Timer>
 
     Widget body;
 
-    body = FittedBox(
-      fit: BoxFit.fitWidth,
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+    body = Container(
+      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+      width: double.infinity,
+      child: FittedBox(
+        fit: BoxFit.fitWidth,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
