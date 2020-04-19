@@ -19,7 +19,8 @@ class Timer extends DeskitWidget<Timer> {
   }
 }
 
-class _TimerState extends DeskitWidgetState<Timer> {
+class _TimerState extends DeskitWidgetState<Timer>
+    with SingleTickerProviderStateMixin {
   int get _now => (data as TimerData).now;
 
   int get _total => (data as TimerData).total;
@@ -34,6 +35,29 @@ class _TimerState extends DeskitWidgetState<Timer> {
 
   var _running = false;
 
+  Animation _animation;
+  AnimationController _animationController;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController =
+        AnimationController(duration: Duration(seconds: _total), vsync: this);
+    _animation = Tween<double>(begin: 1, end: 0).animate(_animationController)
+      ..addListener(() {
+        setState(() {});
+      });
+  }
+
+  void _startAnimation({bool stop = false}) {
+    if (_animationController.isAnimating) {
+      _animationController.stop();
+    }
+    if (!stop) {
+      _animationController.forward(from: 1 - _progress);
+    }
+  }
+
   void _run() {
     setState(() {
       _running = true;
@@ -43,30 +67,30 @@ class _TimerState extends DeskitWidgetState<Timer> {
       (timer) {
         setState(() {
           _now = _now - 1;
+          if (_now == 0) {
+            reset();
+            notifyFinish();
+          }
         });
-        if (_now == 0) {
-          timer.cancel();
-          _running = false;
-          notifyFinish();
-        }
       },
     );
+    _startAnimation();
   }
 
-  void _pause() {
-    setState(() {
-      _running = false;
-      _internalTimer?.cancel();
-      _internalTimer = null;
-    });
+  void _stop() {
+    _running = false;
+    _internalTimer?.cancel();
+    _internalTimer = null;
+    if (_animationController.isAnimating) {
+      _animationController.stop();
+    }
   }
 
   @override
   void reset() {
-    _running = false;
-    _internalTimer?.cancel();
-    _internalTimer = null;
     super.reset();
+    _stop();
+    _startAnimation(stop: true);
   }
 
   void notifyFinish() {}
@@ -98,10 +122,15 @@ class _TimerState extends DeskitWidgetState<Timer> {
             alignment: Alignment.center,
             children: [
               SizedBox(
-                child: CircularProgressIndicator(
-                  value: _progress,
-                  backgroundColor: Color.alphaBlend(
-                      Color.fromARGB(230, 255, 255, 255), Colors.amber),
+                child: AnimatedBuilder(
+                  animation: _animationController,
+                  builder: (context, child) {
+                    return CircularProgressIndicator(
+                      value: _running ? _animation?.value : _progress,
+                      backgroundColor: Color.alphaBlend(
+                          Color.fromARGB(230, 255, 255, 255), Colors.amber),
+                    );
+                  },
                 ),
                 height: 150,
                 width: 150,
@@ -134,7 +163,9 @@ class _TimerState extends DeskitWidgetState<Timer> {
               if (!_running) {
                 _run();
               } else {
-                _pause();
+                setState(() {
+                  _stop();
+                });
               }
             },
           ),
@@ -143,6 +174,12 @@ class _TimerState extends DeskitWidgetState<Timer> {
     );
 
     return wrapWithNameTag(body, config.name);
+  }
+
+  @override
+  void dispose() {
+    _animationController?.dispose();
+    super.dispose();
   }
 }
 
