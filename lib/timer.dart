@@ -6,6 +6,7 @@ import 'package:deskit/deskit_widget.dart';
 import 'package:deskit/model/timer_config.dart';
 import 'package:deskit/model/timer_data.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 
 class Timer extends DeskitWidget<Timer> {
   Timer(this.config, id, repository, key, scaffoldKey, parentState)
@@ -94,7 +95,31 @@ class _TimerState extends DeskitWidgetState<Timer>
     _startAnimation(stop: true);
   }
 
-  void notifyFinish() {}
+  void notifyFinish() async {
+    if (widget.config.sound) {
+      await FlutterRingtonePlayer.playAlarm();
+    }
+    await CustomAlertDialog.show(
+        widget.scaffoldKey.currentContext,
+        Container(
+          padding: EdgeInsets.symmetric(vertical: 30),
+          child: Wrap(
+            alignment: WrapAlignment.center,
+            runAlignment: WrapAlignment.center,
+            children: [
+              Text(
+                'Time is up',
+                style: TextStyle(color: Colors.white, fontSize: 30),
+              )
+            ],
+          ),
+        ),
+        backgroundColor:
+            Color.alphaBlend(Color.fromARGB(180, 0, 0, 0), Colors.white));
+    if (widget.config.sound) {
+      await FlutterRingtonePlayer.stop();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
