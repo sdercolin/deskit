@@ -4,6 +4,7 @@ import 'package:deskit/deskit_widget.dart';
 import 'package:deskit/edit_widget_page.dart';
 import 'package:deskit/model/coin_config.dart';
 import 'package:deskit/model/dice_config.dart';
+import 'package:deskit/model/timer_config.dart';
 import 'package:deskit/model/value_keeper_config.dart';
 import 'package:deskit/model/widget_data.dart';
 import 'package:deskit/model/widget_type_info.dart';
@@ -35,6 +36,8 @@ abstract class Config<T extends DeskitWidget> {
         return CoinConfig.fromJson(jsonString);
       case DiceConfig.TYPE:
         return DiceConfig.fromJson(jsonString);
+      case TimerConfig.TYPE:
+        return TimerConfig.fromJson(jsonString);
       default:
         return null;
     }

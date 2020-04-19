@@ -1,12 +1,17 @@
 import 'package:deskit/common/snack_bar_util.dart';
 import 'package:deskit/common/text_edit_alert_dialog.dart';
+import 'package:deskit/common/time_picker_alert_dialog.dart';
+import 'package:deskit/common/time_util.dart';
 import 'package:deskit/consts/style.dart';
 import 'package:deskit/model/coin_config.dart';
 import 'package:deskit/model/config.dart';
 import 'package:deskit/model/dice_config.dart';
+import 'package:deskit/model/timer_config.dart';
 import 'package:deskit/model/value_keeper_config.dart';
 import 'package:deskit/model/widget_type_info.dart';
+import 'package:deskit/timer.dart';
 import 'package:deskit/value_keeper.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
@@ -271,7 +276,61 @@ class DiceConfigEditList extends ConfigEditList<DiceConfig> {
         (value) => config.requestSidesEveryTime = value,
       ).build(),
       SizedBox(height: 10),
-    ].where((element) => element != null).toList();
+    ];
+  }
+}
+
+class TimerConfigEditList extends ConfigEditList<TimerConfig> {
+  TimerConfigEditList(
+      TimerConfig originalConfig, EditWidgetPageState parentState)
+      : super(originalConfig, parentState);
+
+  @override
+  List<Widget> buildList(BuildContext context, TimerConfig config) {
+    return <Widget>[
+      _DropdownConfigItem<TimerStyle>(
+        parentState,
+        'Style',
+        () => config.style,
+        (value) => config.style = value,
+        TimerStyle.values,
+        TimerStyle.values.map((e) => e.displayName).toList(),
+      ).build(),
+      _StringEditConfigItem(
+        context,
+        parentState,
+        'Display name',
+        () => config.name,
+        (value) => config.name = value,
+      ).build(),
+      _TimePickerConfigItem(
+        context,
+        parentState,
+        'Time',
+        () => config.totalSec,
+        (value) => config.totalSec = value,
+        isVisible: !config.requestTotalEveryTime,
+      ).build(),
+      _SwitchConfigItem(
+        parentState,
+        'Vibration',
+        () => config.vibrate,
+        (value) => config.vibrate = value,
+      ).build(),
+      _SwitchConfigItem(
+        parentState,
+        'Sound',
+        () => config.sound,
+        (value) => config.sound = value,
+      ).build(),
+      _SwitchConfigItem(
+        parentState,
+        'Ask for time when reset',
+        () => config.requestTotalEveryTime,
+        (value) => config.requestTotalEveryTime = value,
+      ).build(),
+      SizedBox(height: 10),
+    ];
   }
 }
 
@@ -358,7 +417,7 @@ abstract class _ValueEditConfigItem extends _ConfigItem {
   @override
   Widget build() {
     if (!isVisible) {
-      return null;
+      return SizedBox.shrink();
     }
     return InkWell(
       child: Container(
@@ -401,6 +460,59 @@ abstract class _ValueEditConfigItem extends _ConfigItem {
   }
 }
 
+class _TimePickerConfigItem extends _ConfigItem {
+  _TimePickerConfigItem(
+    this.context,
+    parentState,
+    this.title,
+    this.getValue,
+    this.setValue, {
+    isVisible = true,
+  }) : super(parentState, isVisible: isVisible);
+
+  final BuildContext context;
+  final String title;
+  final int Function() getValue;
+  final void Function(int) setValue;
+
+  @override
+  Widget build() {
+    if (!isVisible) {
+      return SizedBox.shrink();
+    }
+    return InkWell(
+      child: Container(
+        constraints: itemConstraints,
+        padding: itemPadding,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Container(
+              child: Text(
+                title,
+                textAlign: TextAlign.left,
+                style: Style.PreferenceTitle,
+              ),
+            ),
+            Container(
+              constraints: BoxConstraints(maxWidth: 200),
+              child: Text(
+                DurationUtil.formatSeconds(getValue.call()),
+                textAlign: TextAlign.right,
+              ),
+            ),
+          ],
+        ),
+      ),
+      onTap: () async {
+        final result = await TimePickerAlertDialog.show(
+            context, title, Duration(seconds: getValue.call()));
+        parentState.update(() => setValue(result.inSeconds));
+      },
+    );
+  }
+}
+
 class _SwitchConfigItem extends _ConfigItem {
   _SwitchConfigItem(
     parentState,
@@ -417,7 +529,7 @@ class _SwitchConfigItem extends _ConfigItem {
   @override
   Widget build() {
     if (!isVisible) {
-      return null;
+      return SizedBox.shrink();
     }
     return Container(
       constraints: itemConstraints,
@@ -468,7 +580,7 @@ class _DropdownConfigItem<T> extends _ConfigItem {
   @override
   Widget build() {
     if (!isVisible) {
-      return null;
+      return SizedBox.shrink();
     }
     return Container(
       constraints: itemConstraints,

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:deskit/deskit_widget.dart';
 import 'package:deskit/model/coin_data.dart';
 import 'package:deskit/model/dice_data.dart';
+import 'package:deskit/model/timer_data.dart';
 import 'package:deskit/model/value_keeper_data.dart';
 import 'package:floor/floor.dart';
 
@@ -23,6 +24,8 @@ abstract class WidgetData<T extends DeskitWidget> {
         return CoinData.fromString(jsonString);
       case DiceData.TYPE:
         return DiceData.fromString(jsonString);
+      case TimerData.TYPE:
+        return TimerData.fromString(jsonString);
       default:
         return null;
     }
