@@ -36,7 +36,7 @@ abstract class DeskitWidgetState<T extends DeskitWidget<T>> extends State<T> {
     widget.repository?.updateAtSync(data, widget.id);
   }
 
-  void preBuild() {
+  void fetchData() {
     defaultData = widget.config.getDefaultData();
     final newData = widget.repository?.get(widget.id);
     if (newData != null) {

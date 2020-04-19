@@ -528,7 +528,13 @@ class _TimePickerConfigItem extends _ConfigItem {
       onTap: () async {
         final result = await TimePickerAlertDialog.show(
             context, title, Duration(seconds: getValue.call()));
-        parentState.update(() => setValue(result.inSeconds));
+        if (result != null) {
+          if (result == Duration.zero) {
+            SnackBarUtil.show(context, '$title should not be zero.');
+            return;
+          }
+          parentState.update(() => setValue(result.inSeconds));
+        }
       },
     );
   }

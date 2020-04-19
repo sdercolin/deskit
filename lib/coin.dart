@@ -102,7 +102,7 @@ class _CoinState extends DeskitWidgetState<Coin> {
 
   @override
   Widget build(BuildContext context) {
-    preBuild();
+    fetchData();
     final config = widget.config;
 
     final fontSize = config.showHistory ? 20.0 : 12.0;

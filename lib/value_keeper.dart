@@ -127,7 +127,7 @@ class _ValueKeeperState extends DeskitWidgetState<ValueKeeper> {
 
   @override
   Widget build(BuildContext context) {
-    preBuild();
+    fetchData();
 
     final config = widget.config;
 

@@ -1,6 +1,8 @@
 import 'dart:async' as async;
 
 import 'package:deskit/common/custom_alert_dialog.dart';
+import 'package:deskit/common/snack_bar_util.dart';
+import 'package:deskit/common/time_picker_alert_dialog.dart';
 import 'package:deskit/common/time_util.dart';
 import 'package:deskit/deskit_widget.dart';
 import 'package:deskit/model/timer_config.dart';
@@ -34,6 +36,10 @@ class _TimerState extends DeskitWidgetState<Timer>
     updateData((data as TimerData).copyWith(now: newValue));
   }
 
+  set _total(int newValue) {
+    updateData((data as TimerData).copyWith(total: newValue));
+  }
+
   async.Timer _internalTimer;
 
   var _running = false;
@@ -44,6 +50,7 @@ class _TimerState extends DeskitWidgetState<Timer>
   @override
   void initState() {
     super.initState();
+    fetchData();
     _animationController =
         AnimationController(duration: Duration(seconds: _total), vsync: this);
     _animation = Tween<double>(begin: 1, end: 0).animate(_animationController)
@@ -52,13 +59,8 @@ class _TimerState extends DeskitWidgetState<Timer>
       });
   }
 
-  void _startAnimation({bool stop = false}) {
-    if (_animationController.isAnimating) {
-      _animationController.stop();
-    }
-    if (!stop) {
-      _animationController.forward(from: 1 - _progress);
-    }
+  void _startAnimation() {
+    _animationController.forward(from: 1 - _progress);
   }
 
   void _run() {
@@ -71,7 +73,7 @@ class _TimerState extends DeskitWidgetState<Timer>
         setState(() {
           _now = _now - 1;
           if (_now == 0) {
-            reset();
+            restart();
             _notifyFinish();
           }
         });
@@ -93,7 +95,16 @@ class _TimerState extends DeskitWidgetState<Timer>
   void reset() {
     super.reset();
     _stop();
-    _startAnimation(stop: true);
+  }
+
+  void restart() {
+    setState(() {
+      _stop();
+      _now = _total;
+    });
+    if (!widget.config.requestTotalEveryTime) {
+      reset();
+    }
   }
 
   void vibrate() async {
@@ -152,7 +163,7 @@ class _TimerState extends DeskitWidgetState<Timer>
 
   @override
   Widget build(BuildContext context) {
-    preBuild();
+    fetchData();
 
     final config = widget.config;
 
@@ -162,7 +173,25 @@ class _TimerState extends DeskitWidgetState<Timer>
         _running ? Icons.clear : Icons.refresh,
         color: Color.fromARGB(60, 0, 0, 0),
       ),
-      onPressed: reset,
+      onPressed: () async {
+        if (config.requestTotalEveryTime) {
+          if (_running) {
+            restart();
+            return;
+          }
+          final result = await TimePickerAlertDialog.show(
+              context, 'Time', Duration(seconds: _total));
+          if (result == null) {
+            return;
+          }
+          _total = result.inSeconds;
+          restart();
+          _animationController.duration = result;
+        } else {
+          restart();
+          _animationController.duration = Duration(seconds: _total);
+        }
+      },
     );
 
     final startStopButton = IconButton(
@@ -173,6 +202,13 @@ class _TimerState extends DeskitWidgetState<Timer>
       ),
       onPressed: () {
         if (!_running) {
+          if (_total == 0) {
+            if (config.requestTotalEveryTime) {
+              SnackBarUtil.show(context,
+                  'Setup time by clicking reset button on the left side first.');
+            }
+            return;
+          }
           _run();
         } else {
           setState(() {

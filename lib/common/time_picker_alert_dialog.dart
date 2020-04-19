@@ -5,6 +5,7 @@ class TimePickerAlertDialog {
   static Future<Duration> show(
       BuildContext context, String title, Duration initialTime) async {
     var duration = initialTime;
+    var confirmed = false;
     await showDialog<Duration>(
       context: context,
       builder: (context) {
@@ -25,13 +26,14 @@ class TimePickerAlertDialog {
             FlatButton(
               child: Text('OK'),
               onPressed: () {
-                Navigator.of(context).pop(duration);
+                confirmed = true;
+                Navigator.of(context).pop();
               },
             ),
           ],
         );
       },
     );
-    return duration;
+    return confirmed ? duration : null;
   }
 }
