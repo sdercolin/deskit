@@ -136,6 +136,7 @@ class _CoinState extends DeskitWidgetState<Coin> {
                 child: _results.isEmpty
                     ? Center(child: Text('No history'))
                     : ListView(
+                        primary: false,
                         children: _results
                             .map((result) => Padding(
                                   padding: EdgeInsets.symmetric(

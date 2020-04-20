@@ -166,6 +166,7 @@ class _DiceState extends DeskitWidgetState<Dice> {
                 child: _results.isEmpty
                     ? Center(child: Text('No history'))
                     : ListView(
+                        primary: false,
                         children: _results
                             .map((result) => Padding(
                                   padding: EdgeInsets.symmetric(

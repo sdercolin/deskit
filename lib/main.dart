@@ -293,7 +293,10 @@ class HomePageState extends State<HomePage> {
             },
             children: widgetWrappers,
           )
-        : ListView(children: widgetWrappers);
+        : ListView(
+            primary: false,
+            children: widgetWrappers,
+          );
   }
 
   @override
