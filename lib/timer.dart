@@ -320,6 +320,8 @@ class _TimerState extends DeskitWidgetState<Timer>
   @override
   void dispose() {
     _animationController?.dispose();
+    _internalTimer?.cancel();
+    _internalTimer = null;
     super.dispose();
   }
 }
