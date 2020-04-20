@@ -108,10 +108,14 @@ class _CoinState extends DeskitWidgetState<Coin> {
     final fontSize = config.showHistory ? 20.0 : 12.0;
     final button = RaisedButton(
         color: Colors.amber,
-        child: Text(
-          'Coin',
-          style: TextStyle(fontSize: fontSize),
-          textAlign: TextAlign.center,
+        child: FittedBox(
+          fit: BoxFit.fitWidth,
+          child: Text(
+            'Coin',
+            style: TextStyle(fontSize: fontSize),
+            textAlign: TextAlign.center,
+            maxLines: 1,
+          ),
         ),
         onPressed: () => _toss(context, 1, config.popupResult),
         onLongPress: config.longPressMultiple
@@ -181,7 +185,7 @@ class _CoinState extends DeskitWidgetState<Coin> {
             SizedBox(width: 20),
             Container(
               height: double.infinity,
-              width: 60,
+              width: 70,
               child: button,
             ),
           ],

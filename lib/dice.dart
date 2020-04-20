@@ -138,10 +138,14 @@ class _DiceState extends DeskitWidgetState<Dice> {
     final fontSize = config.showHistory ? 20.0 : 12.0;
     final button = RaisedButton(
         color: Colors.amber,
-        child: Text(
-          config.requestSidesEveryTime ? 'dX' : 'd${config.sides}',
-          style: TextStyle(fontSize: fontSize),
-          textAlign: TextAlign.center,
+        child: FittedBox(
+          fit: BoxFit.fitWidth,
+          child: Text(
+            config.requestSidesEveryTime ? 'dX' : 'd${config.sides}',
+            style: TextStyle(fontSize: fontSize),
+            textAlign: TextAlign.center,
+            maxLines: 1,
+          ),
         ),
         onPressed: () => _roll(context, 1, config),
         onLongPress: config.longPressMultiple
