@@ -156,7 +156,7 @@ class HomePageState extends State<HomePage> {
     );
   }
 
-  void _resetWidget(BuildContext context, int index) async {
+  void _resetWidget(int index) async {
     _myWidgetStateKeys[index].currentState.reset();
     resetFocus();
   }
@@ -167,14 +167,19 @@ class HomePageState extends State<HomePage> {
       context,
       EditWidgetPage.routeName,
       arguments: EditWidgetPageArguments(settings.configs[index]),
-    );
+    ) as EditWidgetPageResult;
 
-    if (result != null) {
+    final config = result?.config;
+
+    if (config != null) {
       final current = _settingsRepository.getCurrent();
       final configs = current.configs.toList();
-      configs[index] = result;
+      configs[index] = config;
       final edited = current.copy(configs: configs);
       await _settingsRepository.update(edited);
+      if (result?.requestResetData == true) {
+        await _widgetDataRepository.removeAt(index);
+      }
       _update();
 
       SnackBarUtil.show(context, 'You have edited a widget.');
@@ -209,11 +214,12 @@ class HomePageState extends State<HomePage> {
   void _addWidget(BuildContext context) async {
     final currentSettings = _settingsRepository.getCurrent();
     final result = await Navigator.pushNamed(context, AddWidgetPage.routeName,
-        arguments: AddWidgetPageArguments(currentSettings));
-    if (result != null) {
+            arguments: AddWidgetPageArguments(currentSettings))
+        as EditWidgetPageResult;
+    if (result?.config != null) {
       final current = _settingsRepository.getCurrent();
       final configs = current.configs.toList();
-      configs.add(result);
+      configs.add(result?.config);
       final edited = current.copy(configs: configs);
       await _settingsRepository.update(edited);
       _update();
@@ -270,7 +276,7 @@ class HomePageState extends State<HomePage> {
                 caption: 'Reset',
                 color: Color.alphaBlend(Colors.white70, Colors.amber),
                 icon: Icons.refresh,
-                onTap: () => _resetWidget(context, index),
+                onTap: () => _resetWidget(index),
               ),
             ],
           )

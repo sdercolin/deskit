@@ -5,6 +5,7 @@ import 'package:deskit/common/text_edit_alert_dialog.dart';
 import 'package:deskit/common/time_picker_alert_dialog.dart';
 import 'package:deskit/common/time_util.dart';
 import 'package:deskit/consts/style.dart';
+import 'package:deskit/deskit_widget.dart';
 import 'package:deskit/model/coin_config.dart';
 import 'package:deskit/model/config.dart';
 import 'package:deskit/model/dice_config.dart';
@@ -27,11 +28,17 @@ class EditWidgetPageState extends State<EditWidgetPage> {
   final key = GlobalKey<ScaffoldState>();
 
   Config currentConfig;
+  bool requestResetData = false;
+  GlobalKey<DeskitWidgetState> _previewKey;
 
   void update(Function() updateFunction) {
     setState(() {
       updateFunction.call();
     });
+  }
+
+  void resetPreview() {
+    _previewKey.currentState.reset();
   }
 
   @override
@@ -41,7 +48,8 @@ class EditWidgetPageState extends State<EditWidgetPage> {
 
     currentConfig ??= args.originalConfig.copy();
 
-    final preview = currentConfig.build(null, null, null, key, this);
+    _previewKey = GlobalKey();
+    final preview = currentConfig.build(null, null, _previewKey, key, this);
     final list = currentConfig.buildEditList(this);
     final typeName = currentConfig.typeInfo.name;
     final title =
@@ -81,6 +89,13 @@ class EditWidgetPageArguments {
   EditWidgetPageArguments(this.originalConfig, {this.isNew = false});
 }
 
+class EditWidgetPageResult {
+  final Config config;
+  final bool requestResetData;
+
+  EditWidgetPageResult(this.config, this.requestResetData);
+}
+
 abstract class ConfigEditList<T extends Config> extends StatelessWidget {
   final T originalConfig;
   final EditWidgetPageState parentState;
@@ -113,7 +128,13 @@ abstract class ConfigEditList<T extends Config> extends StatelessWidget {
                 padding: EdgeInsets.symmetric(horizontal: 30),
                 child: Text('Save'),
                 onPressed: () {
-                  Navigator.pop(context, parentState.currentConfig);
+                  Navigator.pop(
+                    context,
+                    EditWidgetPageResult(
+                      parentState.currentConfig,
+                      parentState.requestResetData,
+                    ),
+                  );
                 },
               ),
             ],
@@ -156,7 +177,10 @@ class ValueKeeperConfigEditList extends ConfigEditList<ValueKeeperConfig> {
         -ValueKeeperConfig.maxAbsoluteValue,
         ValueKeeperConfig.maxAbsoluteValue,
         () => config.initialValue,
-        (value) => config.initialValue = value,
+        (value) {
+          config.initialValue = value;
+          parentState.resetPreview();
+        },
       ).build(),
       _IntegerEditConfigItem(
         context,
@@ -301,7 +325,13 @@ class TimerConfigEditList extends ConfigEditList<TimerConfig> {
         parentState,
         'Time',
         () => config.totalSec,
-        (value) => config.totalSec = value,
+        (value) {
+          if (config.totalSec != value) {
+            config.totalSec = value;
+            parentState.requestResetData = true;
+            parentState.resetPreview();
+          }
+        },
         isVisible: !config.requestTotalEveryTime,
       ).build(),
       _SwitchConfigItem(
