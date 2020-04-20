@@ -172,7 +172,7 @@ class _DiceState extends DeskitWidgetState<Dice> {
                                       horizontal: 5, vertical: 3),
                                   child: Text(
                                     result.buildText(),
-                                    style: TextStyle(fontSize: 10),
+                                    style: TextStyle(fontSize: 12),
                                   ),
                                 ))
                             .toList()

@@ -142,7 +142,7 @@ class _CoinState extends DeskitWidgetState<Coin> {
                                       horizontal: 5, vertical: 3),
                                   child: Text(
                                     result.buildText(),
-                                    style: TextStyle(fontSize: 10),
+                                    style: TextStyle(fontSize: 12),
                                   ),
                                 ))
                             .toList()
