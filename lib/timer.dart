@@ -249,25 +249,31 @@ class _TimerState extends DeskitWidgetState<Timer>
                     height: 150,
                     width: 150,
                   ),
-                  Column(
-                    children: [
-                      Text(
-                        DurationUtil.formatSeconds(_now),
-                        style: TextStyle(
-                          fontSize: 40,
-                          color: Colors.black54,
-                          fontWeight: FontWeight.w300,
+                  SizedBox(
+                    width: 120,
+                    child: Column(
+                      children: [
+                        FittedBox(
+                          fit: BoxFit.fitWidth,
+                          child: Text(
+                            DurationUtil.formatSeconds(_now),
+                            style: TextStyle(
+                              fontSize: 40,
+                              color: Colors.black54,
+                              fontWeight: FontWeight.w300,
+                            ),
+                          ),
                         ),
-                      ),
-                      Text(
-                        DurationUtil.formatSeconds(_total),
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.black54,
-                          fontWeight: FontWeight.w300,
+                        Text(
+                          DurationUtil.formatSeconds(_total),
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.black54,
+                            fontWeight: FontWeight.w300,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ],
               ),
